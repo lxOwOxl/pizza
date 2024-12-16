@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Pizza Form</title>
+    <!-- Thêm Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <nav th:replace="~{layout/base :: navbar}"></nav>
+    <div class="container mt-5">
+      <h1 class="text-center mb-4">Pizza Form</h1>
+      <form
+        th:action="@{/admin/pizza/save}"
+        th:object="${pizza}"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <input type="hidden" th:field="*{id}" />
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            th:field="*{product.name}"
+            placeholder="Enter pizza name"
+          />
+          <div
+            th:if="${#fields.hasErrors('product.name')}"
+            class="text-danger mt-1"
+          >
+            <span th:errors="*{product.name}"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="price-small">Price Small:</label>
+          <input
+            type="number"
+            class="form-control"
+            id="price-small"
+            th:field="*{smallPrice}"
+            placeholder="Enter price for Small size"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="price-medium">Price Medium:</label>
+          <input
+            type="number"
+            class="form-control"
+            id="price-medium"
+            th:field="*{mediumPrice}"
+            placeholder="Enter price for Medium size"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="price-large">Price Large:</label>
+          <input
+            type="number"
+            class="form-control"
+            id="price-large"
+            th:field="*{largePrice}"
+            placeholder="Enter price for Large size"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea
+            class="form-control"
+            id="description"
+            th:field="*{product.description}"
+            rows="3"
+            placeholder="Enter description"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="image">Upload Image:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="image"
+            th:field="*{product.image}"
+            placeholder="Enter image name"
+          />
+        </div>
+
+        <fieldset class="form-group">
+          <legend>Loại pizza:</legend>
+          <div class="form-check">
+            <input
+              type="radio"
+              class="form-check-input"
+              id="seafood"
+              th:field="*{type}"
+              value="Hải sản"
+            />
+            <label class="form-check-label" for="seafood">Hải sản</label>
+          </div>
+          <div class="form-check">
+            <input
+              type="radio"
+              class="form-check-input"
+              id="meat"
+              th:field="*{type}"
+              value="Thịt"
+            />
+            <label class="form-check-label" for="meat">Thịt</label>
+          </div>
+          <div class="form-check">
+            <input
+              type="radio"
+              class="form-check-input"
+              id="vegetarian"
+              th:field="*{type}"
+              value="Ăn chay"
+            />
+            <label class="form-check-label" for="vegetarian">Ăn chay</label>
+          </div>
+          <div th:if="${#fields.hasErrors('type')}" class="text-danger mt-1">
+            <span th:errors="*{type}"></span>
+          </div>
+        </fieldset>
+
+        <fieldset class="form-group">
+          <legend>Cay:</legend>
+          <div class="form-check">
+            <input
+              type="radio"
+              class="form-check-input"
+              id="spicy-yes"
+              th:field="*{spicy}"
+              value="true"
+            />
+            <label class="form-check-label" for="spicy-yes">Có</label>
+          </div>
+          <div class="form-check">
+            <input
+              type="radio"
+              class="form-check-input"
+              id="spicy-no"
+              th:field="*{spicy}"
+              value="false"
+            />
+            <label class="form-check-label" for="spicy-no">Không</label>
+          </div>
+        </fieldset>
+
+        <div class="form-group text-center">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <a href="/pizzas" class="btn btn-secondary ml-2">Cancel</a>
+        </div>
+      </form>
+    </div>
+    <!-- Thêm Bootstrap JS và Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>

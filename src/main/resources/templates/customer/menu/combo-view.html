@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Combo Details</title>
+  </head>
+  <body>
+    <h1>Combo: <span th:text="${combo.name}"></span></h1>
+
+    <!-- Duyệt qua từng loại sản phẩm -->
+    <div th:each="entry : ${productsByCategory}">
+      <h2 th:text="${entry.key}"></h2>
+      <ul>
+        <!-- Duyệt qua danh sách sản phẩm của từng loại -->
+        <li th:each="product : ${entry.value}">
+          <label>
+            <input
+              type="radio"
+              th:name="${entry.key}"
+              th:value="${product.id}"
+            />
+            <span th:text="${product.name}"></span> - $<span
+              th:text="${product.basePrice}"
+            ></span>
+          </label>
+        </li>
+      </ul>
+    </div>
+  </body>
+</html>

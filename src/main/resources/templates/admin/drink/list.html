@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý Pizza</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav th:replace="~{layout/base :: navbar}"></nav>
+    <div>
+      <h1 class="text-center">Danh sách Nước uống</h1>
+      <a class="btn btn-primary mb-3" th:href="@{/admin/drink/add}"
+        >Thêm Pizza</a
+      >
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>ID</th>
+            <th>Tên</th>
+            <th>Giá</th>
+            <th>Mô tả</th>
+            <th>Hình ảnh</th>
+            <th>Hành động</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="drink : ${drinks}">
+            <td th:text="${drink.id}"></td>
+            <td th:text="${drink.product.name}"></td>
+            <td th:text="${drink.price}"></td>
+            <td th:text="${drink.product.description}"></td>
+            <td>
+              <img
+                th:src="@{'/img/drink/'+${drink.product.image}}"
+                alt="Ảnh Pizza"
+                width="100"
+              />
+            </td>
+            <td>
+              <a
+                class="btn btn-sm btn-warning"
+                th:href="@{'/admin/drink/edit/' + ${drink.id}}"
+                >Sửa</a
+              >
+              <a
+                class="btn btn-sm btn-danger"
+                th:href="@{'/admin/drink/delete/' + ${drink.id}}"
+                >Xóa</a
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

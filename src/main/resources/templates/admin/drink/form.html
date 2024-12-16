@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Drink Form</title>
+    <!-- Thêm Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+    />
+  </head>
+  <body>
+    <nav th:replace="~{layout/base :: navbar}"></nav>
+    <div class="container mt-5">
+      <h1 class="text-center mb-4">Drink Form</h1>
+      <form
+        th:action="@{/admin/drink/save}"
+        th:object="${drink}"
+        method="post"
+        enctype="multipart/form-data"
+      >
+        <input type="hidden" th:field="*{id}" />
+        <div class="form-group">
+          <label for="name">Name:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="name"
+            th:field="*{product.name}"
+            placeholder="Enter drink name"
+          />
+          <div
+            th:if="${#fields.hasErrors('product.name')}"
+            class="text-danger mt-1"
+          >
+            <span th:errors="*{product.name}"></span>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="price-small">Price:</label>
+          <input
+            type="number"
+            class="form-control"
+            id="price-small"
+            th:field="*{price}"
+            placeholder="Enter price for Small size"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="description">Description:</label>
+          <textarea
+            class="form-control"
+            id="description"
+            th:field="*{product.description}"
+            rows="3"
+            placeholder="Enter description"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="image">Tên Image:</label>
+          <input
+            type="text"
+            class="form-control"
+            id="image"
+            th:field="*{product.image}"
+            placeholder="Enter image name"
+          />
+        </div>
+
+        <div class="form-group text-center">
+          <button type="submit" class="btn btn-primary">Save</button>
+          <a th:href="@{/admin/drink/list}" class="btn btn-secondary ml-2"
+            >Cancel</a
+          >
+        </div>
+      </form>
+    </div>
+    <!-- Thêm Bootstrap JS và Popper.js -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
