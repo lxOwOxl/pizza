@@ -8,11 +8,11 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
 import jakarta.persistence.InheritanceType;
-import java.math.BigDecimal;
 
+import java.util.Objects;
+
+import com.example.pizza.enums.Category;
 import com.example.pizza.enums.ProductType;
 
 @Entity
@@ -21,7 +21,7 @@ public class Product {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Integer id; // id dạng String thay vì Long
+    private Integer id;
 
     @Column(name = "name", columnDefinition = "NVARCHAR(255)")
     private String name;
@@ -31,6 +31,9 @@ public class Product {
     private Boolean spicy;
     @Enumerated(EnumType.STRING)
     private ProductType type;
+
+    @Enumerated(EnumType.STRING)
+    private Category category;
 
     // Constructor mặc định
     public Product() {
@@ -83,6 +86,14 @@ public class Product {
 
     public void setType(ProductType type) {
         this.type = type;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 
 }

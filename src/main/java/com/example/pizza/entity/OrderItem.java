@@ -2,7 +2,12 @@ package com.example.pizza.entity;
 
 import java.math.BigDecimal;
 
+import com.example.pizza.enums.Crust;
+import com.example.pizza.enums.Size;
+
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -28,6 +33,11 @@ public class OrderItem {
     @JoinColumn(name = "combo_id")
     private Combo combo;
     private int quantity;
+
+    @Enumerated(EnumType.STRING)
+    private Size size;
+    @Enumerated(EnumType.STRING)
+    private Crust crust;
     private BigDecimal price;
 
     // Getters and Setters
@@ -77,5 +87,29 @@ public class OrderItem {
 
     public void setCombo(Combo combo) {
         this.combo = combo;
+    }
+
+    public Product getProduct() {
+        return product;
+    }
+
+    public void setProduct(Product product) {
+        this.product = product;
+    }
+
+    public Size getSize() {
+        return size;
+    }
+
+    public void setSize(Size size) {
+        this.size = size;
+    }
+
+    public Crust getCrust() {
+        return crust;
+    }
+
+    public void setCrust(Crust crust) {
+        this.crust = crust;
     }
 }

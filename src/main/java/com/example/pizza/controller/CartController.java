@@ -1,6 +1,10 @@
 package com.example.pizza.controller;
 
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -12,6 +16,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.example.pizza.entity.Combo;
 import com.example.pizza.entity.CrustPrice;
 import com.example.pizza.entity.Product;
 import com.example.pizza.entity.ProductPrice;
@@ -21,8 +26,8 @@ import com.example.pizza.enums.ProductType;
 import com.example.pizza.enums.Size;
 import com.example.pizza.model.Cart;
 import com.example.pizza.model.CartItem;
-import com.example.pizza.model.ProductDTO;
 import com.example.pizza.service.CartService;
+import com.example.pizza.service.ComboService;
 import com.example.pizza.service.ProductService;
 
 @Controller
@@ -30,7 +35,8 @@ import com.example.pizza.service.ProductService;
 public class CartController {
     @Autowired
     private ProductService productService;
-
+    @Autowired
+    private ComboService comboService;
     @Autowired
     private CartService cartService;
 
@@ -53,11 +59,17 @@ public class CartController {
         return "redirect:/cart";
     }
 
-    @GetMapping("/{id}")
+    @PostMapping("/combo={id}/select")
+    public String handleSelectedProducts(@PathVariable Integer id,
+            @RequestParam String[] selectedProducts,
+            @RequestParam int quantity,
+            Model model) {
+        List<Integer> productIds = Arrays.stream(selectedProducts)
+                .map(Integer::parseInt)
+                .collect(Collectors.toList());
+        cartService.processSelectedProducts(id, productIds, quantity);
 
-    public String addProduct(@PathVariable Integer id) {
-
-        return "redirect:/cart";
+        return "redirect:/cart"; // Tên file HTML hiển thị kết quả
     }
 
     @GetMapping
@@ -101,7 +113,7 @@ public class CartController {
             model.addAttribute("largeCrustPrices", largeCrustPrices); // chứa giá theo size vừa
             // chứa giá theo từng size
         }
-        return "customer/menu/choose-size";
+        return "customer/menu/customize-product";
     }
 
     @GetMapping("/checkout")

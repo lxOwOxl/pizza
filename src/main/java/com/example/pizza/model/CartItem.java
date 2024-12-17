@@ -2,7 +2,9 @@ package com.example.pizza.model;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
+import com.example.pizza.entity.Product;
 import com.example.pizza.enums.Crust;
 import com.example.pizza.enums.ProductType;
 import com.example.pizza.enums.Size;
@@ -50,6 +52,16 @@ public class CartItem {
     }
 
     public CartItem() {
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (o == null || getClass() != o.getClass())
+            return false;
+        CartItem cartItem = (CartItem) o;
+        return Objects.equals(id, cartItem.id); // So sánh chỉ theo id
     }
 
     public int getId() {
