@@ -1,12 +1,21 @@
 package com.example.pizza.service;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.pizza.entity.Combo;
+import com.example.pizza.entity.Product;
+import com.example.pizza.enums.Crust;
 import com.example.pizza.enums.ProductType;
+import com.example.pizza.enums.Size;
 import com.example.pizza.model.Cart;
 import com.example.pizza.model.CartItem;
 import com.example.pizza.repository.CrustPriceRepository;
@@ -16,9 +25,12 @@ import com.example.pizza.repository.ProductPriceRepository;
 public class CartService {
     @Autowired
     private ProductPriceRepository productPriceRepository;
-
+    @Autowired
+    private ProductService productService;
     @Autowired
     private CrustPriceRepository crustPriceRepository;
+    @Autowired
+    private ComboService comboService;
     @Autowired
     private Cart cart;
 
@@ -28,6 +40,89 @@ public class CartService {
             total = total.add(cartItem.getTotalPrice());
         }
         return total;
+    }
+
+    public void processSelectedProducts(int id, List<Integer> productIds, int quantity) {
+        // Lấy combo từ database
+        Combo combo = comboService.getComboById(id);
+        CartItem cartItem = new CartItem();
+        cartItem.setId(combo.getId());
+        cartItem.setName(combo.getName());
+        cartItem.setImage(combo.getImage());
+        cartItem.setType(ProductType.COMBO);
+        List<CartItem> cartItems = new ArrayList<CartItem>();
+        for (Integer productId : productIds) {
+            // Lấy thông tin sản phẩm từ productId
+            Product product = productService.getProductById(productId);
+
+            // Mặc định số lượng là 1
+            int quantityPro = 1;
+
+            // Tạo CartItem mới từ sản phẩm và các thông tin liên quan (Size, Crust, v.v.)
+            CartItem cartItemChild = createCartItem(product, combo.getSize(), Crust.TRADITIONAL, quantityPro);
+
+            // Kiểm tra xem sản phẩm này có đã tồn tại trong cartItems chưa
+            boolean itemExists = false;
+            for (CartItem existingItem : cartItems) {
+                if (existingItem.getId() == cartItemChild.getId()) {
+                    // Nếu sản phẩm đã có trong giỏ hàng, cộng dồn số lượng và cập nhật tổng giá trị
+                    existingItem.setQuantity(existingItem.getQuantity() + quantityPro);
+                    itemExists = true;
+                    break; // Dừng vòng lặp khi đã tìm thấy sản phẩm trùng
+                }
+            }
+
+            // Nếu sản phẩm chưa tồn tại trong giỏ hàng, thêm mới vào danh sách cartItems
+            if (!itemExists) {
+                cartItems.add(cartItemChild);
+            }
+        }
+        cartItem.setProductList(cartItems);
+        cartItem.setQuantity(quantity);
+        for (Map.Entry<Integer, CartItem> entry : cart.getItems().entrySet()) {
+            CartItem existingItem = entry.getValue();
+            int existKey = entry.getKey();
+            printProductIds(existingItem.getProductList());
+            printProductIds(cartItem.getProductList());
+
+            System.out.println(existingItem.getProductList().equals(cartItem.getProductList()));
+            if (existingItem.getId() == cartItem.getId()
+                    && existingItem.getProductList().equals(cartItem.getProductList())) {
+                existingItem.setQuantity(existingItem.getQuantity() + cartItem.getQuantity());
+                existingItem.setTotalPrice(combo.getPrice().multiply(BigDecimal.valueOf(existingItem.getQuantity())));
+                cart.getItems().put(existKey, existingItem);
+                return;
+
+            }
+        }
+        cartItem.setTotalPrice(combo.getPrice().multiply(BigDecimal.valueOf(quantity)));
+        cart.getItems().put(Cart.counter++, cartItem);
+
+    }
+
+    public void printProductIds(List<CartItem> products) {
+        if (products == null || products.isEmpty()) {
+            System.out.println("Danh sách sản phẩm trống.");
+            return;
+        }
+
+        System.out.println("Danh sách productId:");
+        products.stream()
+                .map(CartItem::getId) // Lấy id của từng product
+                .forEach(System.out::println); // In từng id ra màn hình
+    }
+
+    private CartItem createCartItem(Product product, Size size, Crust crust, int quantity) {
+        CartItem cartItem = new CartItem();
+        cartItem.setId(product.getId());
+        cartItem.setName(product.getName());
+        cartItem.setImage(product.getImage());
+        cartItem.setType(product.getType());
+        if (product.getType() == ProductType.PIZZA) {
+            cartItem.setCrust(crust);
+            cartItem.setSize(size);
+        }
+        return cartItem;
     }
 
     public boolean equals(CartItem cartItem1, CartItem cartItem2) {
