@@ -9,6 +9,7 @@ import com.example.pizza.enums.ProductType;
 import com.example.pizza.repository.ComboRepository;
 import com.example.pizza.repository.ProductRepository;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -64,4 +65,7 @@ public class ComboService {
         return comboRepository.findById(id).orElse(null);
     }
 
+    public BigDecimal getPriceById(int id) {
+        return comboRepository.findPriceById(id);
+    }
 }

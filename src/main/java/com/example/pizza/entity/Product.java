@@ -1,15 +1,20 @@
 package com.example.pizza.entity;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
+import jakarta.persistence.OneToMany;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.example.pizza.enums.Category;
@@ -34,6 +39,9 @@ public class Product {
 
     @Enumerated(EnumType.STRING)
     private Category category;
+
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    private List<ProductPrice> prices = new ArrayList<>();
 
     // Constructor mặc định
     public Product() {
@@ -94,6 +102,14 @@ public class Product {
 
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    public List<ProductPrice> getPrices() {
+        return prices;
+    }
+
+    public void setPrices(List<ProductPrice> prices) {
+        this.prices = prices;
     }
 
 }

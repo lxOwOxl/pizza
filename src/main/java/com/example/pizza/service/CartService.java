@@ -42,7 +42,7 @@ public class CartService {
         return total;
     }
 
-    public void processSelectedProducts(int id, List<Integer> productIds, int quantity) {
+    public void addCombo(int id, List<Integer> productIds, int quantity) {
         // Lấy combo từ database
         Combo combo = comboService.getComboById(id);
         CartItem cartItem = new CartItem();
@@ -65,7 +65,7 @@ public class CartService {
             boolean itemExists = false;
             for (CartItem existingItem : cartItems) {
                 if (existingItem.getId() == cartItemChild.getId()) {
-                    // Nếu sản phẩm đã có trong giỏ hàng, cộng dồn số lượng và cập nhật tổng giá trị
+
                     existingItem.setQuantity(existingItem.getQuantity() + quantityPro);
                     itemExists = true;
                     break; // Dừng vòng lặp khi đã tìm thấy sản phẩm trùng
@@ -84,18 +84,20 @@ public class CartService {
             int existKey = entry.getKey();
             printProductIds(existingItem.getProductList());
             printProductIds(cartItem.getProductList());
+            if (existingItem.getType() == ProductType.COMBO) {
+                System.out.println(existingItem.getProductList().equals(cartItem.getProductList()));
+                if (existingItem.getId() == cartItem.getId()
+                        && existingItem.getProductList().equals(cartItem.getProductList())) {
+                    existingItem.setQuantity(existingItem.getQuantity() + cartItem.getQuantity());
+                    existingItem.setTotalPrice(calculateCartItemPrice(existingItem));
+                    cart.getItems().put(existKey, existingItem);
+                    return;
 
-            System.out.println(existingItem.getProductList().equals(cartItem.getProductList()));
-            if (existingItem.getId() == cartItem.getId()
-                    && existingItem.getProductList().equals(cartItem.getProductList())) {
-                existingItem.setQuantity(existingItem.getQuantity() + cartItem.getQuantity());
-                existingItem.setTotalPrice(combo.getPrice().multiply(BigDecimal.valueOf(existingItem.getQuantity())));
-                cart.getItems().put(existKey, existingItem);
-                return;
-
+                }
             }
+
         }
-        cartItem.setTotalPrice(combo.getPrice().multiply(BigDecimal.valueOf(quantity)));
+        cartItem.setTotalPrice(calculateCartItemPrice(cartItem));
         cart.getItems().put(Cart.counter++, cartItem);
 
     }
@@ -110,6 +112,71 @@ public class CartService {
         products.stream()
                 .map(CartItem::getId) // Lấy id của từng product
                 .forEach(System.out::println); // In từng id ra màn hình
+    }
+
+    public void updateCombo(int id, List<Integer> productIds, int quantity, int keyToEdit) {
+
+        // Lấy combo từ database
+        Combo combo = comboService.getComboById(id);
+        CartItem itemToEdit = new CartItem();
+        itemToEdit.setId(combo.getId());
+        itemToEdit.setName(combo.getName());
+        itemToEdit.setImage(combo.getImage());
+        itemToEdit.setType(ProductType.COMBO);
+        List<CartItem> itemChildList = new ArrayList<CartItem>();
+        for (Integer productId : productIds) {
+            // Lấy thông tin sản phẩm từ productId
+            Product product = productService.getProductById(productId);
+
+            // Mặc định số lượng là 1
+            int quantityPro = 1;
+
+            // Tạo CartItem mới từ sản phẩm và các thông tin liên quan (Size, Crust, v.v.)
+            CartItem itemToEditChild = createCartItem(product, combo.getSize(), Crust.TRADITIONAL, quantityPro);
+
+            // Kiểm tra xem sản phẩm này có đã tồn tại trong itemChildList chưa
+            boolean itemExists = false;
+            for (CartItem existingItem : itemChildList) {
+                if (existingItem.getId() == itemToEditChild.getId()) {
+
+                    existingItem.setQuantity(existingItem.getQuantity() + quantityPro);
+                    itemExists = true;
+                    break; // Dừng vòng lặp khi đã tìm thấy sản phẩm trùng
+                }
+            }
+
+            // Nếu sản phẩm chưa tồn tại trong giỏ hàng, thêm mới vào danh sách
+            // itemChildList
+            if (!itemExists) {
+                itemChildList.add(itemToEditChild);
+            }
+        }
+        itemToEdit.setProductList(itemChildList);
+        for (Map.Entry<Integer, CartItem> entry : cart.getItems().entrySet()) {
+            CartItem existingItem = entry.getValue();
+            int existKey = entry.getKey();
+            printProductIds(existingItem.getProductList());
+            printProductIds(itemToEdit.getProductList());
+            if (existKey == keyToEdit)
+                continue;
+            if (existingItem.getType() == ProductType.COMBO) {
+                System.out.println(existingItem.getProductList().equals(itemToEdit.getProductList()));
+                if (existingItem.getId() == itemToEdit.getId()
+                        && existingItem.getProductList().equals(itemToEdit.getProductList())) {
+                    existingItem.setQuantity(existingItem.getQuantity() + quantity);
+                    existingItem.setTotalPrice(calculateCartItemPrice(existingItem));
+                    cart.getItems().put(existKey, existingItem);
+                    cart.getItems().remove(keyToEdit);
+
+                    return;
+
+                }
+            }
+        }
+        itemToEdit.setQuantity(quantity);
+        itemToEdit.setTotalPrice(calculateCartItemPrice(itemToEdit));
+        cart.getItems().put(keyToEdit, itemToEdit);
+
     }
 
     private CartItem createCartItem(Product product, Size size, Crust crust, int quantity) {
@@ -134,8 +201,10 @@ public class CartService {
                 && cartItem1.getCrust().equals(cartItem2.getCrust());
     }
 
-    public void addCartItem(CartItem itemToAdd) {
-
+    public void addItem(int productId, Size size, Crust crust, int quantity) {
+        Product product = productService.getProductById(productId);
+        CartItem itemToAdd = new CartItem(productId, product.getName(), product.getImage(), size, crust,
+                product.getType(), quantity);
         for (Map.Entry<Integer, CartItem> entry : cart.getItems().entrySet()) {
             CartItem existingItem = entry.getValue();
             int existKey = entry.getKey();
@@ -154,7 +223,12 @@ public class CartService {
 
     }
 
-    public void updateItem(CartItem ItemToEdit, Integer keyToEdit) {
+    public void updateItem(int productId, Size size, Crust crust, int quantity, Integer keyToEdit) {
+
+        Product product = productService.getProductById(productId);
+
+        CartItem ItemToEdit = new CartItem(productId, product.getName(), product.getImage(), size, crust,
+                product.getType(), quantity);
         for (Map.Entry<Integer, CartItem> entry : cart.getItems().entrySet()) {
             CartItem existingItem = entry.getValue();
             int existKey = entry.getKey();
@@ -189,14 +263,15 @@ public class CartService {
     }
 
     public BigDecimal calculateCartItemPrice(CartItem cartItem) {
-
-        BigDecimal basePrice = cartItem.getSize() != null
-                ? productPriceRepository.findPriceByProductIdAndSize(cartItem.getId(), cartItem.getSize())
-                : productPriceRepository.findPriceByProductId(cartItem.getId());
-        BigDecimal add_crust_price = cartItem
-                .getSize() != null ? crustPriceRepository.findPriceBySizeAndCrust(cartItem.getSize(),
-                        cartItem.getCrust()) : BigDecimal.ZERO;
-        return basePrice.add(add_crust_price).multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+        if (cartItem.getType() == ProductType.COMBO) {
+            return comboService.getPriceById(cartItem.getId()).multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+        }
+        BigDecimal addCrustPrice = BigDecimal.ZERO;
+        if (cartItem.getType() == ProductType.PIZZA) {
+            addCrustPrice = crustPriceRepository.findPriceBySizeAndCrust(cartItem.getSize(), cartItem.getCrust());
+        }
+        BigDecimal basePrice = productPriceRepository.findPriceByProductIdAndSize(cartItem.getId(), cartItem.getSize());
+        return basePrice.add(addCrustPrice).multiply(BigDecimal.valueOf(cartItem.getQuantity()));
 
     }
 

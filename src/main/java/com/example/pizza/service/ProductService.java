@@ -25,6 +25,10 @@ public class ProductService {
     @Autowired
     private CrustPriceRepository crustPriceRepository;
 
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
     public List<ProductPrice> getPriceListByProduct(int productId) {
         return productPriceRepository.findByProductId(productId);
     }

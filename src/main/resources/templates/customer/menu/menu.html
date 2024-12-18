@@ -7,32 +7,62 @@
       href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css"
       rel="stylesheet"
     />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="css/menu.css" />
+    <style>
+      /* Hiệu ứng nổi khi hover vào card */
+      .card {
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        border: none;
+      }
+      .card:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+      }
+      /* Canh giữa navbar items */
+      .navbar-nav {
+        margin: auto;
+      }
+      /* Tùy chỉnh biểu tượng */
+      .icon-btn {
+        border: none;
+        background: none;
+        font-size: 1.2rem;
+        margin-left: 10px;
+      }
+    </style>
   </head>
-  <body
-    data-bs-spy="scroll"
-    data-bs-target="#menuNavbar"
-    data-bs-offset="70"
-    tabindex="0"
-  >
+  <body>
     <!-- Navbar -->
-    <nav id="menuNavbar" class="navbar navbar-expand-lg fixed-top">
-      <div class="container-fluid">
-        <a class="navbar-brand" href="#">Luxury Pizza Menu</a>
+    <!-- Navbar Section -->
+    <nav
+      id="menuNavbar"
+      class="navbar navbar-expand-lg navbar-light bg-light fixed-top"
+      th:replace="layout/customer-nav.html"
+    ></nav>
+
+    <!-- Menu Section -->
+    <nav
+      class="navbar navbar-expand-lg navbar-light bg-light mt-5 pt-3 fixed-top"
+    >
+      <div class="container">
         <button
           class="navbar-toggler"
           type="button"
           data-bs-toggle="collapse"
           data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
         >
           <span class="navbar-toggler-icon"></span>
         </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
+        <div
+          class="collapse navbar-collapse justify-content-center"
+          id="navbarNav"
+        >
+          <ul class="navbar-nav">
             <li class="nav-item">
               <a class="nav-link active" href="#comboSection">Combo</a>
             </li>
@@ -45,18 +75,6 @@
             <li class="nav-item">
               <a class="nav-link" href="#sideDishSection">SideDish</a>
             </li>
-            <!-- Nút chuyển đổi ngôn ngữ -->
-            <li class="nav-item">
-              <button class="btn btn-light">Language</button>
-            </li>
-            <!-- Nút giỏ hàng -->
-            <li class="nav-item">
-              <button class="btn btn-light">Cart</button>
-            </li>
-            <!-- Nút thiết lập tài khoản -->
-            <li class="nav-item">
-              <button class="btn btn-light">Account</button>
-            </li>
           </ul>
         </div>
       </div>
@@ -65,57 +83,67 @@
     <!-- Content Sections -->
     <div class="container mt-5 pt-5">
       <!-- Combo Section -->
-      <section id="comboSection" class="bg-dark text-light">
-        <h2 class="text-center text-uppercase mb-4">Combo</h2>
-        <div class="row" th:each="combo : ${combos}">
-          <div class="col-md-4 mb-4">
-            <a
-              th:href="@{/menu/combo={name}/{id}(id=${combo.id}, name=${combo.name})}"
-              class="text-decoration-none"
+      <section id="comboSection" class="text-center mb-5">
+        <h2 class="text-uppercase mb-4">Combo</h2>
+        <div class="row">
+          <div class="col-md-4 mb-4" th:each="combo : ${combos}">
+            <form
+              th:action="@{/menu/combo/custom}"
+              method="POST"
+              class="card h-100"
             >
-              <div class="card">
-                <img
-                  th:src="@{${combo.image}}"
-                  class="card-img-top"
-                  alt="Combo Image"
-                />
-                <div class="card-body">
-                  <h5 class="card-title" th:text="${combo.name}"></h5>
-                  <p class="card-text" th:text="${combo.description}"></p>
-                </div>
+              <img
+                th:src="@{${combo.image}}"
+                class="card-img-top"
+                alt="Combo Image"
+              />
+              <div class="card-body">
+                <h5 class="card-title" th:text="${combo.name}"></h5>
+                <p class="card-text" th:text="${combo.description}"></p>
+                <input type="hidden" name="id" th:value="${combo.id}" />
+                <button type="submit" class="btn btn-primary">Thử Ngay</button>
               </div>
-            </a>
+            </form>
           </div>
         </div>
       </section>
 
       <!-- Pizza Section -->
-      <section id="pizzaSection">
-        <h2 class="text-center text-uppercase mb-4">Pizza</h2>
-        <div class="row" th:each="pizza : ${pizzas}">
-          <a class="col-md-4 mb-4" th:href="@{/menu/{id}(id=${pizza.id})}">
-            <div class="card">
+      <section id="pizzaSection" class="text-center mb-5">
+        <h2 class="text-uppercase mb-4">Pizza</h2>
+        <div class="row">
+          <div class="col-md-4 mb-4" th:each="pizza : ${pizzas}">
+            <form
+              th:action="@{/menu/product/custom}"
+              method="POST"
+              class="card h-100"
+            >
               <img
-                th:src="@{'img/pizza/'+${pizza.image}}"
+                th:src="@{'img/pizza/' + ${pizza.image}}"
                 class="card-img-top"
                 alt="Pizza Image"
               />
               <div class="card-body">
                 <h5 class="card-title" th:text="${pizza.name}"></h5>
                 <p class="card-text" th:text="${pizza.description}"></p>
-                <p class="card-text"></p>
+                <input type="hidden" name="id" th:value="${pizza.id}" />
+                <button type="submit" class="btn btn-primary">Thử Ngay</button>
               </div>
-            </div>
-          </a>
+            </form>
+          </div>
         </div>
       </section>
 
       <!-- Drink Section -->
-      <section id="drinkSection" class="bg-dark text-light">
-        <h2 class="text-center text-uppercase mb-4">Drink</h2>
-        <div class="row" th:each="drink : ${drinks}">
-          <a class="col-md-4 mb-4" th:href="@{/menu/{id}(id=${drink.id}) }">
-            <div class="card">
+      <section id="drinkSection" class="text-center mb-5">
+        <h2 class="text-uppercase mb-4">Drink</h2>
+        <div class="row">
+          <div class="col-md-4 mb-4" th:each="drink : ${drinks}">
+            <form
+              th:action="@{/menu/product/custom}"
+              method="POST"
+              class="card h-100"
+            >
               <img
                 th:src="@{${drink.image}}"
                 class="card-img-top"
@@ -124,22 +152,24 @@
               <div class="card-body">
                 <h5 class="card-title" th:text="${drink.name}"></h5>
                 <p class="card-text" th:text="${drink.description}"></p>
-
-                <button type="submit" class="btn btn-primary">
-                  Add to Cart
-                </button>
+                <input type="hidden" name="id" th:value="${drink.id}" />
+                <button type="submit" class="btn btn-primary">Thử Ngay</button>
               </div>
-            </div>
-          </a>
+            </form>
+          </div>
         </div>
       </section>
 
       <!-- SideDish Section -->
-      <section id="sideDishSection">
-        <h2 class="text-center text-uppercase mb-4">SideDish</h2>
-        <div class="row" th:each="sideDish : ${sideDishes}">
-          <div class="col-md-4 mb-4">
-            <div class="card">
+      <section id="sideDishSection" class="text-center mb-5">
+        <h2 class="text-uppercase mb-4">SideDish</h2>
+        <div class="row">
+          <div class="col-md-4 mb-4" th:each="sideDish : ${sideDishes}">
+            <form
+              th:action="@{/menu/product/custom}"
+              method="POST"
+              class="card h-100"
+            >
               <img
                 th:src="@{${sideDish.image}}"
                 class="card-img-top"
@@ -148,8 +178,10 @@
               <div class="card-body">
                 <h5 class="card-title" th:text="${sideDish.name}"></h5>
                 <p class="card-text" th:text="${sideDish.description}"></p>
+                <input type="hidden" name="id" th:value="${sideDish.id}" />
+                <button type="submit" class="btn btn-primary">Thử Ngay</button>
               </div>
-            </div>
+            </form>
           </div>
         </div>
       </section>

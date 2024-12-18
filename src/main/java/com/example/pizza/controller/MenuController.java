@@ -45,13 +45,12 @@ public class MenuController {
         return "customer/menu/menu";
     }
 
-    @GetMapping("/{id}")
-    public String getProduct(@PathVariable int id, Model model) {
+    @PostMapping("/product/custom")
+    public String getProduct(@RequestParam int id, Model model) {
         Product product = productService.getProductById(id);
         List<ProductPrice> productPrices = productService.getPriceListByProduct(id);
         model.addAttribute("product", product);
         model.addAttribute("quantity", 1);
-        model.addAttribute("key", -1); // Xác định xem là thêm hay chỉnh sửa sản phẩm
         model.addAttribute("productPrices", productPrices);
         if (product.getType() == ProductType.PIZZA) {
             List<CrustPrice> mediumCrustPrices = productService.getCrustPriceListBySize(Size.MEDIUM);
@@ -66,8 +65,8 @@ public class MenuController {
         return "customer/menu/customize-product";
     }
 
-    @GetMapping("/combo={name}/{id}")
-    public String getComboOptions(@PathVariable Integer id, Model model) {
+    @PostMapping("/combo/custom")
+    public String getComboOptions(@RequestParam Integer id, Model model) {
         Combo combo = comboService.getComboById(id);
 
         // Load danh sách sản phẩm cho combo kèm thông tin maxQuantity

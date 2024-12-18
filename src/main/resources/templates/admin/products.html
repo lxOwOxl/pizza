@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý sản phẩm</title>
+    <!-- Bootstrap 5 -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+    />
+  </head>
+  <body>
+    <nav id="adminNavBar" th:replace="layout/admin-nav.html"></nav>
+
+    <!-- Content -->
+    <div class="content">
+      <div class="container mt-4">
+        <!-- Tiêu đề -->
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2>Quản lý sản phẩm</h2>
+          <button
+            class="btn btn-primary"
+            data-bs-toggle="modal"
+            data-bs-target="#addProductModal"
+          >
+            <i class="fas fa-plus"></i> Thêm sản phẩm
+          </button>
+        </div>
+
+        <!-- Bảng sản phẩm -->
+        <table class="table table-striped">
+          <thead class="table-dark">
+            <tr>
+              <th>ID</th>
+              <th>Tên sản phẩm</th>
+              <th>Loại Sản phẩm</th>
+              <th>Vị cay</th>
+              <th>Phân loại</th>
+              <th>Giá</th>
+              <th>Hành động</th>
+            </tr>
+          </thead>
+          <tbody>
+            <!-- Lặp qua danh sách sản phẩm -->
+            <tr th:each="product : ${products}">
+              <td th:text="${product.id}"></td>
+              <td th:text="${product.name}"></td>
+              <td th:text="${product.type}"></td>
+              <td
+                th:text="${product.spicy != null ? (product.spicy ? 'Có' : 'Cay') : 'N/A'}"
+              ></td>
+              <td th:text="${product.category}"></td>
+              <td>
+                <table class="table table-borderless mb-0">
+                  <tbody>
+                    <tr th:each="price : ${product.prices}">
+                      <td
+                        th:text="${price.size != null ? price.size : ' '}"
+                      ></td>
+                      <td th:text="${price.price + 'vnd'}"></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+
+              <td>
+                <button
+                  class="btn btn-sm btn-outline-info"
+                  data-bs-toggle="modal"
+                  data-bs-target="#editProductModal"
+                  th:attr="data-id=${product.id}, data-name=${product.name}, data-price=${product.prices}, data-category=${product.category}"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <a
+                  th:href="@{/admin/products/delete/{id}(id=${product.id})}"
+                  class="btn btn-sm btn-outline-danger"
+                >
+                  <i class="fas fa-trash"></i>
+                </a>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Modal Thêm sản phẩm -->
+    <div
+      class="modal fade"
+      id="addProductModal"
+      tabindex="-1"
+      aria-labelledby="addProductModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form th:action="@{/admin/products/add}" method="post">
+            <div class="modal-header">
+              <h5 class="modal-title" id="addProductModalLabel">
+                Thêm sản phẩm
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="name" class="form-label">Tên sản phẩm</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="name"
+                  name="name"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="price" class="form-label">Giá</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="price"
+                  name="price"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="category" class="form-label">Loại</label>
+                <select
+                  class="form-select"
+                  id="category"
+                  name="category"
+                  required
+                >
+                  <option value="Pizza">Pizza</option>
+                  <option value="Combo">Combo</option>
+                  <option value="Nước uống">Nước uống</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Hủy
+              </button>
+              <button type="submit" class="btn btn-primary">Lưu</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal Chỉnh sửa sản phẩm -->
+    <div
+      class="modal fade"
+      id="editProductModal"
+      tabindex="-1"
+      aria-labelledby="editProductModalLabel"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <form th:action="@{/admin/products/edit}" method="post">
+            <input type="hidden" id="editProductId" name="id" />
+            <div class="modal-header">
+              <h5 class="modal-title" id="editProductModalLabel">
+                Chỉnh sửa sản phẩm
+              </h5>
+              <button
+                type="button"
+                class="btn-close"
+                data-bs-dismiss="modal"
+                aria-label="Close"
+              ></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label for="editName" class="form-label">Tên sản phẩm</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="editName"
+                  name="name"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="editPrice" class="form-label">Giá</label>
+                <input
+                  type="number"
+                  class="form-control"
+                  id="editPrice"
+                  name="price"
+                  required
+                />
+              </div>
+              <div class="mb-3">
+                <label for="editCategory" class="form-label">Loại</label>
+                <select
+                  class="form-select"
+                  id="editCategory"
+                  name="category"
+                  required
+                >
+                  <option value="Pizza">Pizza</option>
+                  <option value="Combo">Combo</option>
+                  <option value="Nước uống">Nước uống</option>
+                </select>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                data-bs-dismiss="modal"
+              >
+                Hủy
+              </button>
+              <button type="submit" class="btn btn-primary">
+                Lưu thay đổi
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Script for handling edit modal -->
+    <script>
+      const editProductModal = document.getElementById("editProductModal");
+      editProductModal.addEventListener("show.bs.modal", function (event) {
+        const button = event.relatedTarget;
+        const id = button.getAttribute("data-id");
+        const name = button.getAttribute("data-name");
+        const price = button.getAttribute("data-price");
+        const category = button.getAttribute("data-category");
+
+        const modalIdInput = editProductModal.querySelector("#editProductId");
+        const modalNameInput = editProductModal.querySelector("#editName");
+        const modalPriceInput = editProductModal.querySelector("#editPrice");
+        const modalCategorySelect =
+          editProductModal.querySelector("#editCategory");
+
+        modalIdInput.value = id;
+        modalNameInput.value = name;
+        modalPriceInput.value = price;
+        modalCategorySelect.value = category;
+      });
+    </script>
+  </body>
+</html>
