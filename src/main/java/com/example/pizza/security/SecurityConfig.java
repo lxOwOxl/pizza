@@ -34,7 +34,7 @@ public class SecurityConfig {
                                 response.sendRedirect("/admin/dashboard");
                             } else {
                                 // Nếu là User, chuyển hướng đến trang thanh toán (checkout)
-                                response.sendRedirect("/order/pizza");
+                                response.sendRedirect("/menu");
                             }
                         })
                         .permitAll())

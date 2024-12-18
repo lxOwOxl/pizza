@@ -7,11 +7,19 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.pizza.entity.Product;
+import com.example.pizza.enums.Category;
+import com.example.pizza.enums.ProductType;
+import com.example.pizza.model.ProductDTO;
 import com.example.pizza.service.OrderService;
 import com.example.pizza.service.ProductService;
 import com.example.pizza.service.UserService;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -34,9 +42,25 @@ public class AdminController {
 
     // 2. Quản lý sản phẩm - Hiển thị danh sách sản phẩm
     @GetMapping("/products")
-    public String listProducts(Model model) {
+    public String listProducts(Model model) throws JsonProcessingException {
         List<Product> products = productService.getAllProducts();
-        model.addAttribute("products", products);
+
+        List<ProductDTO> productDTOs = new ArrayList<>();
+
+        for (Product product : products) {
+            try {
+                ProductDTO productDTO = new ProductDTO(product);
+                productDTOs.add(productDTO);
+            } catch (JsonProcessingException e) {
+                System.err.println("Error while processing JSON: " + e.getMessage());
+            }
+        }
+        model.addAttribute("products", productDTOs);
+        model.addAttribute("categories", Category.values());
+        model.addAttribute("types", Arrays.stream(ProductType.values())
+                .filter(productType -> productType != ProductType.COMBO)
+                .toArray());
+
         return "admin/products";
     }
 
