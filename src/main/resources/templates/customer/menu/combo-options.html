@@ -6,6 +6,7 @@
   <body>
     <h1>Combo Options</h1>
     <form th:action="@{/cart/combo={id}/select(id=${combo.id})}" method="post">
+      <input type="hidden" name="key" th:value="${key}" />
       <!-- Lặp qua từng loại sản phẩm -->
       <div th:each="entry : ${productOptions}">
         <h3 th:text="${entry.key}">Product Type</h3>
@@ -17,6 +18,7 @@
                 type="checkbox"
                 th:name="'selectedProducts[]'"
                 th:value="${product.id}"
+                th:checked="${selectedProductIds != null && selectedProductIds.contains(product.id)}"
               />
               <span th:text="${product.name}"></span>
             </label>
