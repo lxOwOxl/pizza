@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <title>Combo Options</title>
+  </head>
+  <body>
+    <h1>Combo Options</h1>
+    <form th:action="@{/cart/combo={id}/select(id=${combo.id})}" method="post">
+      <!-- Lặp qua từng loại sản phẩm -->
+      <div th:each="entry : ${productOptions}">
+        <h3 th:text="${entry.key}">Product Type</h3>
+        <ul>
+          <!-- Lặp qua danh sách sản phẩm trong từng loại -->
+          <li th:each="product : ${entry.value.products}">
+            <label>
+              <input
+                type="checkbox"
+                th:name="'selectedProducts[]'"
+                th:value="${product.id}"
+              />
+              <span th:text="${product.name}"></span>
+            </label>
+          </li>
+        </ul>
+        <!-- Hiển thị số lượng tối đa người dùng có thể chọn -->
+        <p th:text="'Maximum selection: ' + ${entry.value.maxQuantity}"></p>
+      </div>
+      <label for="quantity">Số Lượng:</label>
+      <input type="number" id="quantity" name="quantity" th:value="1" min="1" />
+      <!-- Nút submit -->
+      <button type="submit">Submit</button>
+    </form>
+
+    <script>
+      document.querySelectorAll("div").forEach(function (div) {
+        const maxQuantity = parseInt(
+          div.querySelector("p").innerText.split(": ")[1]
+        );
+        const checkboxes = div.querySelectorAll('input[type="checkbox"]');
+
+        checkboxes.forEach(function (checkbox) {
+          checkbox.addEventListener("change", function () {
+            const checkedCount = div.querySelectorAll(
+              'input[type="checkbox"]:checked'
+            ).length;
+            if (checkedCount > maxQuantity) {
+              alert("You can only select up to " + maxQuantity + " items.");
+              this.checked = false;
+            }
+          });
+        });
+      });
+    </script>
+  </body>
+</html>
