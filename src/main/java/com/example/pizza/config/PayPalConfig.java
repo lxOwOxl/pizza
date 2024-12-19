@@ -13,13 +13,13 @@ public class PayPalConfig {
     @Value("${paypal.client.secret}")
     private String clientSecret;
     @Value("${paypal.mode}")
-    private String mode; 
+    private String mode;
 
     @Bean
     public APIContext apiContext() {
         System.out.println("PayPal mode: " + mode); // In giá trị mode ra console
         if (!"sandbox".equalsIgnoreCase(mode) && !"live".equalsIgnoreCase(mode)) {
-            throw new IllegalArgumentException("Paypalmode "+ mode);
+            throw new IllegalArgumentException("Paypalmode " + mode);
         }
         return new APIContext(clientId, clientSecret, mode);
     }

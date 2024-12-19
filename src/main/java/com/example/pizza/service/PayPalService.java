@@ -6,6 +6,7 @@ import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
@@ -23,11 +24,14 @@ public class PayPalService {
             String intent,
             String description,
             String cancelUrl,
-            String successUrl
-    ) throws PayPalRESTException {
+            String successUrl) throws PayPalRESTException {
         Amount amount = new Amount();
+        Locale localeVN = new Locale("vi", "VN");
+
+        NumberFormat numberFormatter = NumberFormat.getNumberInstance(localeVN);
+        String formattedTotal = numberFormatter.format(total);
         amount.setCurrency(currency);
-        amount.setTotal(String.format("%.2f", total));
+        amount.setTotal(formattedTotal);
 
         Transaction transaction = new Transaction();
         transaction.setDescription(description);
@@ -55,8 +59,7 @@ public class PayPalService {
 
     public Payment executePayment(
             String paymentId,
-            String payerId
-    ) throws PayPalRESTException {
+            String payerId) throws PayPalRESTException {
         Payment payment = new Payment();
         payment.setId(paymentId);
 

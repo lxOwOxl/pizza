@@ -3,23 +3,26 @@ package com.example.pizza.controller;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.pizza.entity.Product;
+import com.example.pizza.entity.ProductPrice;
 import com.example.pizza.enums.Category;
 import com.example.pizza.enums.ProductType;
-import com.example.pizza.model.ProductDTO;
+import com.example.pizza.enums.Size;
+import com.example.pizza.service.FileSystemStorageService;
 import com.example.pizza.service.OrderService;
 import com.example.pizza.service.ProductService;
 import com.example.pizza.service.UserService;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
+import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
 @RequestMapping("/admin")
@@ -34,6 +37,9 @@ public class AdminController {
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private FileSystemStorageService fileSystemStorageService;
+
     // 1. Hiển thị trang Admin Dashboard
     @GetMapping("/dashboard")
     public String dashboard() {
@@ -44,32 +50,52 @@ public class AdminController {
     @GetMapping("/products")
     public String listProducts(Model model) throws JsonProcessingException {
         List<Product> products = productService.getAllProducts();
-
-        List<ProductDTO> productDTOs = new ArrayList<>();
-
-        for (Product product : products) {
-            try {
-                ProductDTO productDTO = new ProductDTO(product);
-                productDTOs.add(productDTO);
-            } catch (JsonProcessingException e) {
-                System.err.println("Error while processing JSON: " + e.getMessage());
-            }
-        }
-        model.addAttribute("products", productDTOs);
-        model.addAttribute("categories", Category.values());
-        model.addAttribute("types", Arrays.stream(ProductType.values())
-                .filter(productType -> productType != ProductType.COMBO)
-                .toArray());
+        model.addAttribute("types", ProductType.values());
+        model.addAttribute("products", products);
 
         return "admin/products";
     }
 
-    // // 3. Thêm sản phẩm mới - Hiển thị form
-    // @GetMapping("/products/new")
-    // public String showAddProductForm(Model model) {
-    // model.addAttribute("product", new Product());
-    // return "admin/add-product";
-    // }
+    // 3. Thêm sản phẩm mới - Hiển thị form
+    @GetMapping("/product/form")
+    public String showForm(@RequestParam(required = false) ProductType type,
+            @RequestParam(required = false) Integer id,
+            Model model) {
+        if (id == null) {
+            model.addAttribute("product", new Product());
+            model.addAttribute("type", type);
+
+        } else {
+            Product product = productService.getProductById(id);
+            type = product.getType();
+
+            model.addAttribute("type", type);
+            model.addAttribute("product", product);
+        }
+
+        model.addAttribute("sizes", Size.values());
+
+        model.addAttribute("categories", Category.getCategoriesByType(type.name()));
+
+        return "admin/product-add";
+    }
+
+    @PostMapping("/product/add")
+    public String addProduct(@ModelAttribute Product product,
+            @RequestParam MultipartFile imageFile) {
+
+        String fileName = fileSystemStorageService.store(imageFile);
+
+        product.setImage(fileName);
+
+        for (ProductPrice price : product.getPrices()) {
+            if (price.getSize() == null)
+                System.out.println("price.getSize()");
+            price.setProduct(product);
+        }
+        productService.save(product);
+        return "redirect:/admin/products";
+    }
 
     // // 4. Thêm sản phẩm mới - Xử lý dữ liệu
     // @PostMapping("/products")
@@ -78,28 +104,20 @@ public class AdminController {
     // return "redirect:/admin/products";
     // }
 
-    // // 5. Sửa sản phẩm - Hiển thị form cập nhật
-    // @GetMapping("/products/edit/{id}")
-    // public String showEditProductForm(@PathVariable Long id, Model model) {
-    // Product product = productService.getProductById(id);
-    // model.addAttribute("product", product);
-    // return "admin/edit-product";
-    // }
-
     // // 6. Sửa sản phẩm - Xử lý dữ liệu cập nhật
-    // @PostMapping("/products/{id}")
-    // public String updateProduct(@PathVariable Long id, @ModelAttribute Product
-    // product) {
-    // productService.updateProduct(id, product);
-    // return "redirect:/admin/products";
-    // }
+    @PostMapping("/product/edit")
+    public String updateProduct(@ModelAttribute Product product) {
+
+        productService.update(product);
+        return "redirect:/admin/products";
+    }
 
     // // 7. Xóa sản phẩm
-    // @GetMapping("/products/delete/{id}")
-    // public String deleteProduct(@PathVariable Long id) {
-    // productService.deleteProduct(id);
-    // return "redirect:/admin/products";
-    // }
+    @PostMapping("/products/delete")
+    public String deleteProduct(@RequestParam int id) {
+        productService.delete(id);
+        return "redirect:/admin/products";
+    }
 
     // // 8. Quản lý đơn hàng - Hiển thị danh sách đơn hàng
     // @GetMapping("/orders")

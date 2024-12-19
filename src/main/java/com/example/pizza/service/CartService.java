@@ -49,7 +49,6 @@ public class CartService {
         cartItem.setId(combo.getId());
         cartItem.setName(combo.getName());
         cartItem.setImage(combo.getImage());
-        cartItem.setType(ProductType.COMBO);
         List<CartItem> cartItems = new ArrayList<CartItem>();
         for (Integer productId : productIds) {
             // Lấy thông tin sản phẩm từ productId
@@ -84,7 +83,7 @@ public class CartService {
             int existKey = entry.getKey();
             printProductIds(existingItem.getProductList());
             printProductIds(cartItem.getProductList());
-            if (existingItem.getType() == ProductType.COMBO) {
+            if (existingItem.getType() == null) {
                 System.out.println(existingItem.getProductList().equals(cartItem.getProductList()));
                 if (existingItem.getId() == cartItem.getId()
                         && existingItem.getProductList().equals(cartItem.getProductList())) {
@@ -122,7 +121,6 @@ public class CartService {
         itemToEdit.setId(combo.getId());
         itemToEdit.setName(combo.getName());
         itemToEdit.setImage(combo.getImage());
-        itemToEdit.setType(ProductType.COMBO);
         List<CartItem> itemChildList = new ArrayList<CartItem>();
         for (Integer productId : productIds) {
             // Lấy thông tin sản phẩm từ productId
@@ -159,7 +157,7 @@ public class CartService {
             printProductIds(itemToEdit.getProductList());
             if (existKey == keyToEdit)
                 continue;
-            if (existingItem.getType() == ProductType.COMBO) {
+            if (existingItem.getType() == null) {
                 System.out.println(existingItem.getProductList().equals(itemToEdit.getProductList()));
                 if (existingItem.getId() == itemToEdit.getId()
                         && existingItem.getProductList().equals(itemToEdit.getProductList())) {
@@ -263,7 +261,7 @@ public class CartService {
     }
 
     public BigDecimal calculateCartItemPrice(CartItem cartItem) {
-        if (cartItem.getType() == ProductType.COMBO) {
+        if (cartItem.getType() == null) {
             return comboService.getPriceById(cartItem.getId()).multiply(BigDecimal.valueOf(cartItem.getQuantity()));
         }
         BigDecimal addCrustPrice = BigDecimal.ZERO;

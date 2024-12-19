@@ -21,7 +21,6 @@ import com.example.pizza.enums.Category;
 import com.example.pizza.enums.ProductType;
 
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
 public class Product {
 
     @Id
@@ -40,7 +39,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private Category category;
 
-    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "product", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ProductPrice> prices = new ArrayList<>();
 
     // Constructor mặc định

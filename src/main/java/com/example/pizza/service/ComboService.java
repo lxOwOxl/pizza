@@ -43,7 +43,7 @@ public class ComboService {
         // Nếu sideDishCate không null, thêm vào map
         if (combo.getSideDishCate() != null) {
             List<Product> sideDishProducts = productRepository.findByCategory(combo.getSideDishCate());
-            productOptions.put(ProductType.SIDE_DISH, Map.of(
+            productOptions.put(ProductType.APPETIZER, Map.of(
                     "products", sideDishProducts,
                     "maxQuantity", combo.getSideDishQuantity()));
         }

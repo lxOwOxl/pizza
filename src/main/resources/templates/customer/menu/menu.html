@@ -93,7 +93,7 @@
               class="card h-100"
             >
               <img
-                th:src="@{${combo.image}}"
+                th:src="@{'/uploads/'+${combo.image}}"
                 class="card-img-top"
                 alt="Combo Image"
               />
@@ -119,7 +119,7 @@
               class="card h-100"
             >
               <img
-                th:src="@{'img/pizza/' + ${pizza.image}}"
+                th:src="@{'/uploads/'+ ${pizza.image}}"
                 class="card-img-top"
                 alt="Pizza Image"
               />
@@ -145,7 +145,7 @@
               class="card h-100"
             >
               <img
-                th:src="@{${drink.image}}"
+                th:src="@{'/uploads/'+${drink.image}}"
                 class="card-img-top"
                 alt="Drink Image"
               />
@@ -171,7 +171,7 @@
               class="card h-100"
             >
               <img
-                th:src="@{${sideDish.image}}"
+                th:src="@{'/uploads/'+${sideDish.image}}"
                 class="card-img-top"
                 alt="SideDish Image"
               />

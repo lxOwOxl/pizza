@@ -96,7 +96,7 @@ public class CartController {
             throw new RuntimeException("Không tìm thấy sản phẩm trong giỏ hàng");
         }
         model.addAttribute("key", key);
-        if (itemToEdit.getType() != ProductType.COMBO) {
+        if (itemToEdit.getType() == null) {
             List<ProductPrice> productPrices = productService.getPriceListByProduct(itemToEdit.getId());
             Product product = productService.getProductById(itemToEdit.getId());
             model.addAttribute("product", product);
