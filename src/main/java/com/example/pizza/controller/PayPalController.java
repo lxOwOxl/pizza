@@ -1,68 +1,95 @@
 package com.example.pizza.controller;
 
 import com.example.pizza.entity.User;
+import com.example.pizza.enums.PaymentMethod;
+import com.example.pizza.model.UserDTO;
+import com.example.pizza.service.OrderService;
 import com.example.pizza.service.PayPalService;
 import com.paypal.api.payments.Links;
 import com.paypal.api.payments.Payment;
 import com.paypal.base.rest.PayPalRESTException;
 
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
 import java.math.BigDecimal;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.servlet.view.RedirectView;
 
 @RestController
+@RequiredArgsConstructor
+@Slf4j
+@RequestMapping("/payment")
 public class PayPalController {
 
     @Autowired
-    private PayPalService payPalService;
+    private OrderService orderService;
 
-    @GetMapping("/payment/success")
-    public String paymentSuccess(@RequestParam String paymentId,
+    private final PayPalService paypalService;
+
+    // @PostMapping("/create")
+    // public RedirectView createPayment(@RequestParam PaymentMethod paymentMethod,
+    // @RequestParam BigDecimal finalAmount) {
+    // if (paymentMethod == PaymentMethod.COD) {
+    // orderService.createOrderCOD(finalAmount, paymentMethod);
+    // } else {
+    // try {
+
+    // // URL hủy và thành công
+    // String cancelUrl = "http://localhost:8080/payment/cancel";
+    // String successUrl = "http://localhost:8080/payment/success";
+
+    // // Chỉ xử lý qua PayPal nếu chọn PayPal
+
+    // Payment payment = paypalService.createPayment(
+    // finalAmount,
+    // "VND", // Đơn vị tiền tệ
+    // "paypal", // Phương thức thanh toán cố định là "paypal"
+    // "sale", // Ý định thanh toán (sale/authorize/order)
+    // "Thanh toán",
+    // cancelUrl,
+    // successUrl);
+    // // Redirect đến PayPal để thanh toán
+    // return new RedirectView(payment.getLinks().get(1).getHref());
+
+    // } catch (Exception e) {
+    // System.err.println(e.getMessage());
+    // return new RedirectView("/payment/error");
+    // }
+    // }
+
+    // }
+
+    @GetMapping("/success")
+    public String paymentSuccess(
+            @RequestParam("paymentId") String paymentId,
             @RequestParam("PayerID") String payerId) {
         try {
-            Payment payment = payPalService.executePayment(paymentId, payerId);
-            return "Thanh toán thành công: " + payment.getState();
-        } catch (PayPalRESTException e) {
-            e.printStackTrace();
-            return "Lỗi khi thanh toán!";
-        }
-    }
-
-    @GetMapping("/payment/cancel")
-    public String paymentCancel() {
-        return "Thanh toán bị hủy!";
-    }
-
-    @PostMapping("/payment")
-    public String startPayment(@RequestParam BigDecimal totalAmount, @ModelAttribute User user) {
-        try {
-            // Tạo yêu cầu thanh toán PayPal
-            System.out.println("Total amount: " + totalAmount);
-            BigDecimal bigDecimal = new BigDecimal(500);
-            Payment payment = payPalService.createPayment(
-                    bigDecimal, "USD", "paypal", "sale",
-                    "Thanh toán cho đơn hàng",
-                    "http://localhost:8080/payment/cancel",
-                    "http://localhost:8080/payment/success");
-
-            // Kiểm tra các liên kết trả về từ PayPal để chuyển hướng
-            for (Links link : payment.getLinks()) {
-                if (link.getRel().equals("approval_url")) {
-                    // Trả về URL chuyển hướng đến PayPal để người dùng thực hiện thanh toán
-                    return "Chuyển hướng đến PayPal: " + link.getHref();
-                }
+            Payment payment = paypalService.executePayment(paymentId, payerId);
+            if (payment.getState().equals("approved")) {
+                return "paymentSuccess";
             }
         } catch (PayPalRESTException e) {
-            // Log lỗi chi tiết để xử lý khi gặp vấn đề
-            e.printStackTrace();
-            return "Lỗi khi tạo thanh toán! Vui lòng thử lại.";
+            log.error("Error occurred:: ", e);
         }
-        return "Lỗi khi tạo thanh toán! Không tìm thấy liên kết chuyển hướng.";
+        return "success";
     }
 
+    @GetMapping("/cancel")
+    public String paymentCancel() {
+        return "paymentCancel";
+    }
+
+    @GetMapping("/payment/error")
+    public String paymentError() {
+        return "paymentError";
+    }
 }

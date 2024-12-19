@@ -1,41 +1,70 @@
 package com.example.pizza.service;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.pizza.entity.Order;
 import com.example.pizza.entity.OrderItem;
+import com.example.pizza.enums.OrderStatus;
+import com.example.pizza.enums.PaymentMethod;
+import com.example.pizza.model.UserDTO;
 import com.example.pizza.repository.OrderItemRepository;
 import com.example.pizza.repository.OrderRepository;
+import com.paypal.api.payments.Payment;
 
 @Service
 public class OrderService {
-
-    @Autowired
-    private OrderItemRepository orderItemRepository;
-
     @Autowired
     private OrderRepository orderRepository;
 
-    // public void addToCart(PizzaVariant pizzaVariant) {
-    // // Lấy thông tin giỏ hàng của người dùng (giả sử đã có sẵn)
-    // Order order = getCurrentOrder();
+    @Autowired
+    private PayPalService paypalService;
 
-    // // Tạo OrderItem mới
-    // OrderItem orderItem = new OrderItem();
-    // orderItem.setPizzaVariant(pizzaVariant);
-    // orderItem.setQuantity(1); // Giả sử số lượng là 1
-    // orderItem.setPrice(pizzaVariant.getPrice());
-    // orderItem.setOrder(order);
+    @Autowired
+    private CartService cartService;
 
-    // // Lưu OrderItem vào giỏ hàng
-    // orderItemRepository.save(orderItem);
-    // }
+    public Order createOrderCOD(BigDecimal totalAmount, PaymentMethod paymentMethod, UserDTO userDTO) {
+        // Tạo đơn hàng COD
+        Order order = new Order();
+        order.setPaymentMethod(paymentMethod);
+        order.setTotalAmount(totalAmount);
+        order.setStatus(OrderStatus.PENDING);
+        order.setOrderDate(LocalDateTime.now());
 
-    // public Order getCurrentOrder() {
-    // // // Lấy giỏ hàng của người dùng (có thể là giỏ hàng hiện tại hoặc tạo mới
-    // nếu
-    // // // chưa có)
-    // // return orderRepository.findByUserAndStatus("USER", "IN_CART");
-    // }
+        // Lưu đơn hàng vào cơ sở dữ liệu
+        return orderRepository.save(order);
+    }
+
+    public Payment createOrderPayPal(BigDecimal totalAmount, String cancelUrl, String successUrl) throws Exception {
+        // Tạo thanh toán PayPal
+        return paypalService.createPayment(
+                totalAmount,
+                "VND",
+                "paypal",
+                "sale",
+                "Thanh toán",
+                cancelUrl,
+                successUrl);
+    }
+
+    public Order completePayPalOrder(String paymentId, String payerId) throws Exception {
+        // Xác nhận giao dịch PayPal
+        Payment payment = paypalService.executePayment(paymentId, payerId);
+
+        if (payment.getState().equals("approved")) {
+            // Lưu thông tin đơn hàng sau khi thanh toán thành công
+            Order order = new Order();
+            order.setPaymentMethod(PaymentMethod.PAYPAL);
+            order.setTotalAmount(new BigDecimal(payment.getTransactions().get(0).getAmount().getTotal()));
+            order.setStatus(OrderStatus.DELIVERED);
+            order.setOrderDate(LocalDateTime.now());
+
+            return orderRepository.save(order);
+        }
+
+        throw new Exception("Thanh toán không thành công.");
+    }
 }

@@ -45,9 +45,9 @@ public class UserController {
 
     @PostMapping("/register")
     public String registerUser(
-            @Valid @ModelAttribute("user") User user,
+            @Valid @ModelAttribute User user,
             BindingResult bindingResult,
-            @RequestParam("confirmPassword") String confirmPassword,
+            @RequestParam String confirmPassword,
             Model model) {
 
         // Kiểm tra nếu có lỗi từ Validation

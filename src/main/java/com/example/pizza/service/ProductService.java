@@ -25,6 +25,10 @@ public class ProductService {
     @Autowired
     private CrustPriceRepository crustPriceRepository;
 
+    public List<Product> getAllProducts() {
+        return productRepository.findAll();
+    }
+
     public List<ProductPrice> getPriceListByProduct(int productId) {
         return productPriceRepository.findByProductId(productId);
     }
@@ -47,20 +51,20 @@ public class ProductService {
     }
 
     // Thêm sản phẩm mới
-    public Product addProduct(Product product) {
+    public Product save(Product product) {
         return productRepository.save(product);
     }
 
     // Cập nhật sản phẩm
-    public Product updateProduct(Product product) {
+    public Product update(Product product) {
         if (productRepository.existsById(product.getId())) {
             return productRepository.save(product);
         }
-        return null; // Nếu không tìm thấy sản phẩm, trả về null
+        return null;
     }
 
     // Xóa sản phẩm
-    public void deleteProduct(int id) {
+    public void delete(int id) {
         productRepository.deleteById(id);
     }
 

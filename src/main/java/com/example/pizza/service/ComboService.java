@@ -9,6 +9,7 @@ import com.example.pizza.enums.ProductType;
 import com.example.pizza.repository.ComboRepository;
 import com.example.pizza.repository.ProductRepository;
 
+import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -42,7 +43,7 @@ public class ComboService {
         // Nếu sideDishCate không null, thêm vào map
         if (combo.getSideDishCate() != null) {
             List<Product> sideDishProducts = productRepository.findByCategory(combo.getSideDishCate());
-            productOptions.put(ProductType.SIDE_DISH, Map.of(
+            productOptions.put(ProductType.APPETIZER, Map.of(
                     "products", sideDishProducts,
                     "maxQuantity", combo.getSideDishQuantity()));
         }
@@ -64,4 +65,7 @@ public class ComboService {
         return comboRepository.findById(id).orElse(null);
     }
 
+    public BigDecimal getPriceById(int id) {
+        return comboRepository.findPriceById(id);
+    }
 }

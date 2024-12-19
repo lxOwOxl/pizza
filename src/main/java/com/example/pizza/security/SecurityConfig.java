@@ -31,10 +31,10 @@ public class SecurityConfig {
 
                             // Chuyển hướng tùy theo vai trò
                             if (isAdmin) {
-                                response.sendRedirect("/admin/users");
+                                response.sendRedirect("/admin/dashboard");
                             } else {
                                 // Nếu là User, chuyển hướng đến trang thanh toán (checkout)
-                                response.sendRedirect("/order/pizza");
+                                response.sendRedirect("/menu");
                             }
                         })
                         .permitAll())

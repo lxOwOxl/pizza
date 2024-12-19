@@ -4,7 +4,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -19,8 +18,6 @@ import com.example.pizza.enums.Size;
 import com.example.pizza.service.ComboService;
 import com.example.pizza.service.ProductService;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -37,7 +34,7 @@ public class MenuController {
         List<Combo> combos = comboService.getAllCombos();
         List<Product> pizzas = productService.getProductsByType(ProductType.PIZZA);
         List<Product> drinks = productService.getProductsByType(ProductType.DRINK);
-        List<Product> sideDishes = productService.getProductsByType(ProductType.SIDE_DISH);
+        List<Product> sideDishes = productService.getProductsByType(ProductType.APPETIZER);
         model.addAttribute("combos", combos);
         model.addAttribute("pizzas", pizzas);
         model.addAttribute("drinks", drinks);
@@ -45,13 +42,12 @@ public class MenuController {
         return "customer/menu/menu";
     }
 
-    @GetMapping("/{id}")
-    public String getProduct(@PathVariable int id, Model model) {
+    @PostMapping("/product/custom")
+    public String getProduct(@RequestParam int id, Model model) {
         Product product = productService.getProductById(id);
         List<ProductPrice> productPrices = productService.getPriceListByProduct(id);
         model.addAttribute("product", product);
         model.addAttribute("quantity", 1);
-        model.addAttribute("key", -1); // Xác định xem là thêm hay chỉnh sửa sản phẩm
         model.addAttribute("productPrices", productPrices);
         if (product.getType() == ProductType.PIZZA) {
             List<CrustPrice> mediumCrustPrices = productService.getCrustPriceListBySize(Size.MEDIUM);
@@ -66,8 +62,8 @@ public class MenuController {
         return "customer/menu/customize-product";
     }
 
-    @GetMapping("/combo={name}/{id}")
-    public String getComboOptions(@PathVariable Integer id, Model model) {
+    @PostMapping("/combo/custom")
+    public String getComboOptions(@RequestParam Integer id, Model model) {
         Combo combo = comboService.getComboById(id);
 
         // Load danh sách sản phẩm cho combo kèm thông tin maxQuantity
