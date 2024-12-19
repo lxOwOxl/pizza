@@ -1,7 +1,6 @@
 package com.example.pizza.entity;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import com.example.pizza.enums.OrderStatus;
@@ -23,6 +22,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Table(name = "orders")
 public class Order {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

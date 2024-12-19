@@ -61,7 +61,7 @@
             alt="Hình ảnh sản phẩm"
             width="100"
           />
-          <input type="hidden" th:value="*{image}" th:field="*{image}" />
+          <input type="hidden" th:field="*{image}" />
         </div>
         <!-- Hình ảnh -->
         <div class="mb-3">
@@ -74,31 +74,32 @@
             accept="image/*"
           />
         </div>
-        <div th:if="${type.name()!='DRINK'}"></div>
-        <!-- Vị cay có hoặc không -->
-        <div class="mb-3">
-          <label class="form-label">Vị cay</label>
-          <div class="form-check">
-            <input
-              type="radio"
-              class="form-check-input"
-              id="spicyYes"
-              name="spicy"
-              th:value="true"
-              th:field="*{spicy}"
-            />
-            <label class="form-check-label" for="spicyYes">Có</label>
-          </div>
-          <div class="form-check">
-            <input
-              type="radio"
-              class="form-check-input"
-              id="spicyNo"
-              name="spicy"
-              th:value="false"
-              th:field="*{spicy}"
-            />
-            <label class="form-check-label" for="spicyNo">Không</label>
+        <div th:if="${type.name()!='DRINK'}">
+          <!-- Vị cay có hoặc không -->
+          <div class="mb-3">
+            <label class="form-label">Vị cay</label>
+            <div class="form-check">
+              <input
+                type="radio"
+                class="form-check-input"
+                id="spicyYes"
+                name="spicy"
+                th:value="true"
+                th:field="*{spicy}"
+              />
+              <label class="form-check-label" for="spicyYes">Có</label>
+            </div>
+            <div class="form-check">
+              <input
+                type="radio"
+                class="form-check-input"
+                id="spicyNo"
+                name="spicy"
+                th:value="false"
+                th:field="*{spicy}"
+              />
+              <label class="form-check-label" for="spicyNo">Không</label>
+            </div>
           </div>
         </div>
         <!-- Loại sản phẩm -->

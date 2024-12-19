@@ -86,9 +86,10 @@ public class AdminController {
     public String addProduct(@ModelAttribute Product product,
             @RequestParam MultipartFile imageFile) {
 
-        String fileName = fileSystemStorageService.store(imageFile);
-
-        product.setImage(fileName);
+        if (!imageFile.isEmpty()) {
+            String fileName = fileSystemStorageService.store(imageFile);
+            product.setImage(fileName);
+        }
 
         for (ProductPrice price : product.getPrices()) {
             if (price.getSize() == null)
