@@ -11,8 +11,6 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
-
 import com.example.pizza.enums.Crust;
 import com.example.pizza.enums.Size;
 
@@ -25,7 +23,7 @@ public interface CrustPriceRepository extends JpaRepository<CrustPrice, Integer>
 
     CrustPrice findByCrustAndSize(Crust crust, Size size);
 
-    @Query("SELECT cp.additionalPrice FROM CrustPrice cp WHERE cp.size = :size and cp.crust=:crust")
-
+    @Query("SELECT COALESCE(p.additionalPrice, 0) FROM CrustPrice p WHERE p.size = :size AND p.crust = :crust")
     BigDecimal findPriceBySizeAndCrust(@Param("size") Size size, @Param("crust") Crust crust);
+
 }

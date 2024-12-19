@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +29,11 @@ import com.example.pizza.enums.ProductType;
 import com.example.pizza.enums.Size;
 import com.example.pizza.model.Cart;
 import com.example.pizza.model.CartItem;
+import com.example.pizza.model.UserDTO;
 import com.example.pizza.service.CartService;
 import com.example.pizza.service.ComboService;
 import com.example.pizza.service.ProductService;
+import com.example.pizza.service.UserService;
 
 @Controller
 @RequestMapping("/cart")
@@ -39,55 +44,56 @@ public class CartController {
     private ComboService comboService;
     @Autowired
     private CartService cartService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/add")
-    public String addPizza(
+    public String addProduct(
             @RequestParam int productId, @RequestParam(required = false) Size size,
             @RequestParam(required = false) Crust crust,
             @RequestParam int quantity,
-            @RequestParam int key) {
-
-        Product product = productService.getProductById(productId);
-
-        CartItem cartItem = new CartItem(productId, product.getName(), product.getImage(), size, crust,
-                product.getType(), quantity);
-        if (key != -1) {
-            cartService.updateItem(cartItem, key);
+            @RequestParam(required = false) Integer key) {
+        if (key != null) {
+            cartService.updateItem(productId, size, crust, quantity, key);
         } else
-            cartService.addCartItem(cartItem);
+            cartService.addItem(productId, size, crust, quantity);
 
-        return "redirect:/cart";
+        return "redirect:/menu";
     }
 
     @PostMapping("/combo={id}/select")
-    public String handleSelectedProducts(@PathVariable Integer id,
+    public String addCombo(@PathVariable Integer id,
             @RequestParam String[] selectedProducts,
             @RequestParam int quantity,
+            @RequestParam(required = false) Integer key,
             Model model) {
         List<Integer> productIds = Arrays.stream(selectedProducts)
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
-        cartService.processSelectedProducts(id, productIds, quantity);
+        if (key != null) {
+            cartService.updateCombo(id, productIds, quantity, key);
+        } else
+            cartService.addCombo(id, productIds, quantity);
 
-        return "redirect:/cart"; // Tên file HTML hiển thị kết quả
+        return "redirect:/menu";
     }
 
     @GetMapping
     public String viewCart(Model model) {
         model.addAttribute("totalAmount", cartService.getTotalAmount());
         model.addAttribute("cartItems", cartService.getItems());
-        return "customer/cart/list";
+        return "customer/cart/cart-view";
     }
 
-    @PostMapping("/remove")
+    @GetMapping("/remove")
     public String removeFromCart(@RequestParam int key) {
         cartService.removeItem(key);
         return "redirect:/cart";
 
     }
 
-    @GetMapping("/edit")
-    public String editCartItem(
+    @PostMapping("/edit")
+    public String editProduct(
             @RequestParam Integer key,
             Model model) {
         System.out.println("Key item to edit" + key);
@@ -96,32 +102,71 @@ public class CartController {
         if (itemToEdit == null) {
             throw new RuntimeException("Không tìm thấy sản phẩm trong giỏ hàng");
         }
-        List<ProductPrice> productPrices = productService.getPriceListByProduct(itemToEdit.getId());
-        Product product = productService.getProductById(itemToEdit.getId());
-
-        model.addAttribute("product", product);
-        model.addAttribute("quantity", itemToEdit.getQuantity());
         model.addAttribute("key", key);
-        model.addAttribute("productPrices", productPrices);
+        if (itemToEdit.getType() == null) {
+            List<ProductPrice> productPrices = productService.getPriceListByProduct(itemToEdit.getId());
+            Product product = productService.getProductById(itemToEdit.getId());
+            model.addAttribute("product", product);
+            model.addAttribute("quantity", itemToEdit.getQuantity());
+            model.addAttribute("productPrices", productPrices);
 
-        if (itemToEdit.getType() == ProductType.PIZZA) {
-            List<CrustPrice> mediumCrustPrices = productService.getCrustPriceListBySize(Size.MEDIUM);
-            List<CrustPrice> largeCrustPrices = productService.getCrustPriceListBySize(Size.LARGE);
-            model.addAttribute("selectCrust", itemToEdit.getCrust());
-            model.addAttribute("selectSize", itemToEdit.getSize());
-            model.addAttribute("mediumCrustPrices", mediumCrustPrices); // chứa giá theo size lớn
-            model.addAttribute("largeCrustPrices", largeCrustPrices); // chứa giá theo size vừa
-            // chứa giá theo từng size
+            if (itemToEdit.getType() == ProductType.PIZZA) {
+                List<CrustPrice> mediumCrustPrices = productService.getCrustPriceListBySize(Size.MEDIUM);
+                List<CrustPrice> largeCrustPrices = productService.getCrustPriceListBySize(Size.LARGE);
+                model.addAttribute("selectCrust", itemToEdit.getCrust());
+                model.addAttribute("selectSize", itemToEdit.getSize());
+                model.addAttribute("mediumCrustPrices", mediumCrustPrices); // chứa giá theo size lớn
+                model.addAttribute("largeCrustPrices", largeCrustPrices); // chứa giá theo size vừa
+                // chứa giá theo từng size
+            }
+            return "customer/menu/customize-product";
         }
-        return "customer/menu/customize-product";
+        Combo combo = comboService.getComboById(itemToEdit.getId());
+
+        // Load danh sách sản phẩm cho combo kèm thông tin maxQuantity
+        Map<ProductType, Object> productOptions = comboService.getComboOptionsWithQuantities(combo);
+        model.addAttribute("combo", combo);
+        // Đưa dữ liệu vào Model
+        model.addAttribute("productOptions", productOptions);
+
+        List<Integer> selectedProductIds = itemToEdit.getProductList().stream()
+                .map(CartItem::getId) // Lấy thuộc tính id từ Product
+                .collect(Collectors.toList());
+        model.addAttribute("selectedProductIds", selectedProductIds);
+        // Trả về tên View (HTML file)
+        return "customer/menu/combo-options";
+
     }
 
     @GetMapping("/checkout")
     public String showCheckoutForm(Model model) {
-        User user = new User();
 
-        model.addAttribute("user", user);
+        UserDTO userDTO = new UserDTO();
+        // Lấy thông tin người dùng đăng nhập (nếu có)
+        // Authentication authentication =
+        // SecurityContextHolder.getContext().getAuthentication();
+        // if (authentication != null && authentication.isAuthenticated()
+        // && !(authentication instanceof AnonymousAuthenticationToken)) {
+        // // Lấy email hoặc username từ thông tin đăng nhập
+        // String username = authentication.getName();
+
+        // // Tìm người dùng trong cơ sở dữ liệu
+        // User user = userService.findByEmailOrUsername(username); // Cần triển khai
+        // phương thức này
+
+        // if (user != null) {
+        // // Gán thông tin từ User vào UserDTO
+        // userDTO.setFullName(user.getFullName());
+        // userDTO.setEmail(user.getEmail());
+        // userDTO.setPhone(user.getPhone());
+        // userDTO.setAddress(user.getAddress());
+        // }
+        // }
+
+        // Thêm UserDTO và tổng tiền vào model
+        model.addAttribute("userDTO", userDTO);
         model.addAttribute("totalAmount", cartService.getTotalAmount());
+
         return "customer/cart/payment";
     }
 

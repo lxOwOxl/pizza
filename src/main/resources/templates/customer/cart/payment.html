@@ -14,9 +14,9 @@
     <div class="container mt-5">
       <h1 class="text-center mb-4">Thanh toán đơn hàng</h1>
       <form
-        action="/payment"
+        action="/payment/create"
         method="post"
-        th:object="${user}"
+        th:object="${userDTO}"
         id="payment-form"
       >
         <div class="row">
@@ -30,7 +30,7 @@
                 name="fullName"
                 class="form-control"
                 placeholder="Nhập họ và tên"
-                th:field="*{fullName}"
+                th:field="*{name}"
                 required
               />
             </div>
@@ -69,7 +69,7 @@
                 name="phoneNumber"
                 class="form-control"
                 placeholder="Nhập số điện thoại"
-                th:field="*{phoneNumber}"
+                th:field="*{phone}"
                 required
               />
             </div>
@@ -135,7 +135,7 @@
                 <span id="finalAmount" th:text="${totalAmount}"></span>
               </p>
             </div>
-            <input type="hidden" name="totalAmount" th:value="${totalAmount}" />
+            <input type="hidden" name="finalAmount" th:value="${totalAmount}" />
             <div class="text-center">
               <button type="submit" class="btn btn-success btn-lg">
                 Xác nhận thanh toán
