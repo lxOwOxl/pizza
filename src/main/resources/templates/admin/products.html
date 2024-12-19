@@ -61,9 +61,9 @@
                   <tbody>
                     <tr th:each="price : ${product.prices}">
                       <td
-                        th:text="${price.size != null ? price.size : ' '}"
+                        th:text="${price.size != null ? price.size : 'N/A'}"
                       ></td>
-                      <td th:text="${price.price + 'vnd'}"></td>
+                      <td th:text="${price.price+ ' đ'}"></td>
                     </tr>
                   </tbody>
                 </table>
@@ -74,7 +74,8 @@
                   class="btn btn-sm btn-outline-info"
                   data-bs-toggle="modal"
                   data-bs-target="#editProductModal"
-                  th:attr="data-id=${product.id}, data-name=${product.name}, data-price=${product.prices}, data-category=${product.category}"
+                  th:attr="data-id=${product.id}, data-name=${product.name}, data-price=${product.pricesJson}, data-category=${product.category}
+                  ,data-type=${product.type}, data-spicy=${product.spicy}"
                 >
                   <i class="fas fa-edit"></i>
                 </button>
@@ -101,7 +102,11 @@
     >
       <div class="modal-dialog">
         <div class="modal-content">
-          <form th:action="@{/admin/products/add}" method="post">
+          <form
+            th:action="@{/admin/products/add}"
+            method="post"
+            th:object="${product}"
+          >
             <div class="modal-header">
               <h5 class="modal-title" id="addProductModalLabel">
                 Thêm sản phẩm
@@ -163,7 +168,7 @@
       </div>
     </div>
 
-    <!-- Modal Chỉnh sửa sản phẩm -->
+    <!-- Modal Edit Product -->
     <div
       class="modal fade"
       id="editProductModal"
@@ -173,20 +178,27 @@
     >
       <div class="modal-dialog">
         <div class="modal-content">
-          <form th:action="@{/admin/products/edit}" method="post">
-            <input type="hidden" id="editProductId" name="id" />
-            <div class="modal-header">
-              <h5 class="modal-title" id="editProductModalLabel">
-                Chỉnh sửa sản phẩm
-              </h5>
-              <button
-                type="button"
-                class="btn-close"
-                data-bs-dismiss="modal"
-                aria-label="Close"
-              ></button>
-            </div>
-            <div class="modal-body">
+          <div class="modal-header">
+            <h5 class="modal-title" id="editProductModalLabel">
+              Chỉnh sửa sản phẩm
+            </h5>
+            <button
+              type="button"
+              class="btn-close"
+              data-bs-dismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">
+            <form
+              id="editProductForm"
+              method="post"
+              th:action="@{/products/edit}"
+            >
+              <!-- Product ID (hidden) -->
+              <input type="hidden" id="editProductId" name="id" />
+
+              <!-- Name -->
               <div class="mb-3">
                 <label for="editName" class="form-label">Tên sản phẩm</label>
                 <input
@@ -197,16 +209,15 @@
                   required
                 />
               </div>
+
+              <!-- Price (multiple prices based on size) -->
               <div class="mb-3">
                 <label for="editPrice" class="form-label">Giá</label>
-                <input
-                  type="number"
-                  class="form-control"
-                  id="editPrice"
-                  name="price"
-                  required
-                />
+                <div id="editPriceContainer"></div>
+                <!-- Giá sẽ được hiển thị ở đây -->
               </div>
+
+              <!-- Category -->
               <div class="mb-3">
                 <label for="editCategory" class="form-label">Loại</label>
                 <select
@@ -215,25 +226,47 @@
                   name="category"
                   required
                 >
-                  <option value="Pizza">Pizza</option>
-                  <option value="Combo">Combo</option>
-                  <option value="Nước uống">Nước uống</option>
+                  <option
+                    th:each="category : ${categories}"
+                    th:value="${category}"
+                    th:text="${category}"
+                  ></option>
                 </select>
               </div>
-            </div>
-            <div class="modal-footer">
-              <button
-                type="button"
-                class="btn btn-secondary"
-                data-bs-dismiss="modal"
-              >
-                Hủy
-              </button>
+
+              <!-- Type -->
+              <div class="mb-3">
+                <label for="editType" class="form-label">Loại sản phẩm</label>
+                <select class="form-select" id="editType" name="type" required>
+                  <option
+                    th:each="type : ${types}"
+                    th:value="${type}"
+                    th:text="${type}"
+                  ></option>
+                </select>
+              </div>
+
+              <!-- Spicy -->
+              <div class="mb-3">
+                <label for="editSpicy" class="form-label">Gia vị</label>
+                <select
+                  class="form-select"
+                  id="editSpicy"
+                  name="spicy"
+                  required
+                >
+                  <option value="true">Có</option>
+                  <option value="false">Không</option>
+                  <option value="null">N/A</option>
+                </select>
+              </div>
+
+              <!-- Submit Button -->
               <button type="submit" class="btn btn-primary">
                 Lưu thay đổi
               </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </div>
@@ -248,19 +281,54 @@
         const button = event.relatedTarget;
         const id = button.getAttribute("data-id");
         const name = button.getAttribute("data-name");
-        const price = button.getAttribute("data-price");
-        const category = button.getAttribute("data-category");
+        const prices = JSON.parse(button.getAttribute("data-price"));
+        const type = button.getAttribute("data-type");
+        const spicy = button.getAttribute("data-spicy");
 
         const modalIdInput = editProductModal.querySelector("#editProductId");
         const modalNameInput = editProductModal.querySelector("#editName");
-        const modalPriceInput = editProductModal.querySelector("#editPrice");
         const modalCategorySelect =
           editProductModal.querySelector("#editCategory");
+        const modalTypeSelect = editProductModal.querySelector("#editType");
+        const modalSpicySelect = editProductModal.querySelector("#editSpicy");
+        const modalPriceContainer = editProductModal.querySelector(
+          "#editPriceContainer"
+        );
 
         modalIdInput.value = id;
         modalNameInput.value = name;
-        modalPriceInput.value = price;
         modalCategorySelect.value = category;
+        modalTypeSelect.value = type;
+        modalSpicySelect.value = spicy;
+
+        // Xóa các ô giá cũ trước khi thêm mới
+        modalPriceContainer.innerHTML = "";
+
+        prices.forEach((price, index) => {
+          const priceRow = document.createElement("div");
+          priceRow.classList.add("d-flex", "mb-2");
+
+          // Tạo trường input cho size
+          const sizeInput = document.createElement("input");
+          sizeInput.type = "text";
+          sizeInput.classList.add("form-control", "me-2");
+          sizeInput.value = price.size; // Gán giá trị size từ productPrice (dùng giá trị String của enum Size)
+          sizeInput.name = `prices[${index}].size`; // Dùng index để phân biệt các phần tử
+
+          // Tạo trường input cho price
+          const priceInput = document.createElement("input");
+          priceInput.type = "number";
+          priceInput.classList.add("form-control", "me-2");
+          priceInput.value = price.price; // Gán giá trị price từ productPrice (BigDecimal đã được chuyển sang số)
+          priceInput.name = `prices[${index}].price`; // Dùng index để phân biệt các phần tử
+
+          // Append các input vào row
+          priceRow.appendChild(sizeInput);
+          priceRow.appendChild(priceInput);
+
+          // Thêm row vào container của modal
+          modalPriceContainer.appendChild(priceRow);
+        });
       });
     </script>
   </body>
