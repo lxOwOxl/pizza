@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Custom Pizza</title>
+  </head>
+  <body>
+    <form action="/cart/update" method="post" th:object="${cartItem}">
+      <label for="pizza">Chỉnh sửa Giỏ hàng:</label>
+
+      <input type="hidden" th:value="${key}" name="key" />
+      <input type="hidden" th:value="${type}" name="type" th:field="*{type}" />
+
+      <input
+        type="hidden"
+        id="productId"
+        name="productId"
+        th:value="*{productId}"
+        th:field="*{productId}"
+      />
+      <input type="hidden" value="*{name}" th:field="*{name}" />
+      <p id="pizzaName" th:text="*{name}"></p>
+      <input type="hidden" th:field="*{basePrice}" th:value="*{basePrice}" />
+      <p id="price" th:text="*{basePrice}"></p>
+
+      <!-- Hiển thị Size và Crust chỉ khi type là 'PIZZA' -->
+      <div th:if="${cartItem.type == 'PIZZA'}">
+        <label for="size">Size:</label>
+        <div>
+          <div th:each="size : ${sizes}">
+            <input
+              type="radio"
+              th:id="'size-' + ${size.id}"
+              name="sizeId"
+              th:value="${size.id}"
+              th:field="*{sizeId}"
+              th:checked="${cartItem.sizeId == size.id}"
+              onchange="updatePizzaPrice()"
+            />
+            <label th:for="'size-' + ${size.id}" th:text="${size.name}"></label>
+          </div>
+        </div>
+
+        <label for="crust">Crust:</label>
+        <div>
+          <div th:each="crust : ${crusts}">
+            <input
+              type="radio"
+              th:id="'crust-' + ${crust.id}"
+              name="crustId"
+              th:value="${crust.id}"
+              th:field="*{crustId}"
+              th:checked="${cartItem.crustId == crust.id}"
+              onchange="updatePizzaPrice()"
+            />
+            <label
+              th:for="'crust-' + ${crust.id}"
+              th:text="${crust.name}"
+            ></label>
+          </div>
+        </div>
+      </div>
+
+      <label for="quantity">Quantity:</label>
+      <input
+        type="number"
+        id="quantity"
+        name="quantity"
+        min="1"
+        th:value="${quantity}"
+        onchange="updatePizzaPrice()"
+        required
+      />
+      <button type="submit">Cập nhật</button>
+    </form>
+
+    <script>
+      function updatePizzaPrice() {
+        // Lấy các giá trị size và crust
+        const productId = document.getElementById("productId").value;
+        const quantity = document.getElementById("quantity").value;
+        const sizeId = document.querySelector(
+          "input[name='sizeId']:checked"
+        )?.value;
+        const crustId = document.querySelector(
+          "input[name='crustId']:checked"
+        )?.value;
+
+        // Gửi AJAX request
+        fetch("/menu/updatePrice", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            productId: productId,
+            sizeId: sizeId,
+            crustId: crustId,
+            quantity: quantity,
+          }),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log(data);
+            // Cập nhật giá trên giao diện
+            document.getElementById("price").textContent = data.price + " VND";
+          })
+          .catch((error) => console.error("Error:", error));
+      }
+    </script>
+  </body>
+</html>

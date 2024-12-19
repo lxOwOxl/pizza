@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pizza Admin Dashboard</title>
+    <link rel="stylesheet" href="css/styles.css" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="d-flex" id="wrapper">
+      <!-- Sidebar -->
+      <div class="bg-dark text-white" id="sidebar-wrapper">
+        <div class="sidebar-heading text-center py-4 fs-4">🍕 Pizza Admin</div>
+        <div class="list-group list-group-flush">
+          <a
+            href="#dashboard"
+            class="list-group-item list-group-item-action bg-dark text-white"
+            >Dashboard</a
+          >
+          <a
+            href="#menu"
+            class="list-group-item list-group-item-action bg-dark text-white"
+            >Menu</a
+          >
+          <a
+            href="#orders"
+            class="list-group-item list-group-item-action bg-dark text-white"
+            >Orders</a
+          >
+          <a
+            href="#users"
+            class="list-group-item list-group-item-action bg-dark text-white"
+            >Users</a
+          >
+          <a
+            href="#settings"
+            class="list-group-item list-group-item-action bg-dark text-white"
+            >Settings</a
+          >
+        </div>
+      </div>
+
+      <!-- Page Content -->
+      <div id="page-content-wrapper" class="w-100">
+        <nav
+          class="navbar navbar-expand-lg navbar-light bg-light border-bottom"
+        >
+          <div class="container-fluid">
+            <button class="btn btn-dark" id="menu-toggle">☰</button>
+            <h1 class="ms-3">Pizza Admin Dashboard</h1>
+          </div>
+        </nav>
+
+        <div class="container mt-4">
+          <section id="dashboard">
+            <h2>Dashboard</h2>
+            <p>
+              Welcome to your admin dashboard. Manage your pizza business
+              efficiently!
+            </p>
+          </section>
+
+          <!-- Menu Section -->
+          <section id="menu" class="mt-5">
+            <h2>Pizza Menu</h2>
+            <table class="table table-bordered">
+              <thead class="table-dark">
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Price</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>1</td>
+                  <td>Margherita</td>
+                  <td>$5.99</td>
+                  <td><button class="btn btn-warning btn-sm">Edit</button></td>
+                </tr>
+              </tbody>
+            </table>
+          </section>
+
+          <!-- Other sections (Orders, Users, Settings) -->
+        </div>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/scripts.js"></script>
+  </body>
+</html>
