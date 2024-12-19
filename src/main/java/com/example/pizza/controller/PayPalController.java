@@ -1,5 +1,9 @@
 package com.example.pizza.controller;
 
+import com.example.pizza.entity.User;
+import com.example.pizza.enums.PaymentMethod;
+import com.example.pizza.model.UserDTO;
+import com.example.pizza.service.OrderService;
 import com.example.pizza.service.PayPalService;
 import com.paypal.api.payments.Links;
 import com.paypal.api.payments.Payment;
@@ -8,9 +12,14 @@ import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+import java.math.BigDecimal;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.view.RedirectView;
@@ -18,40 +27,48 @@ import org.springframework.web.servlet.view.RedirectView;
 @RestController
 @RequiredArgsConstructor
 @Slf4j
+@RequestMapping("/payment")
 public class PayPalController {
+
+    @Autowired
+    private OrderService orderService;
 
     private final PayPalService paypalService;
 
-    @PostMapping("/payment/create")
-    public RedirectView createPayment() {
-        try {
-            // Tính tổng tiền cuối cùng nếu có mã giảm giá
-            double finalAmount = Double.parseDouble("100");
+    // @PostMapping("/create")
+    // public RedirectView createPayment(@RequestParam PaymentMethod paymentMethod,
+    // @RequestParam BigDecimal finalAmount) {
+    // if (paymentMethod == PaymentMethod.COD) {
+    // orderService.createOrderCOD(finalAmount, paymentMethod);
+    // } else {
+    // try {
 
-            // URL hủy và thành công
-            String cancelUrl = "http://localhost:8080/payment/cancel";
-            String successUrl = "http://localhost:8080/payment/success";
+    // // URL hủy và thành công
+    // String cancelUrl = "http://localhost:8080/payment/cancel";
+    // String successUrl = "http://localhost:8080/payment/success";
 
-            // Chỉ xử lý qua PayPal nếu chọn PayPal
+    // // Chỉ xử lý qua PayPal nếu chọn PayPal
 
-            Payment payment = paypalService.createPayment(
-                    finalAmount,
-                    "USD", // Đơn vị tiền tệ
-                    "paypal", // Phương thức thanh toán cố định là "paypal"
-                    "sale", // Ý định thanh toán (sale/authorize/order)
-                    "Thanh toán",
-                    cancelUrl,
-                    successUrl);
-            // Redirect đến PayPal để thanh toán
-            return new RedirectView(payment.getLinks().get(1).getHref());
+    // Payment payment = paypalService.createPayment(
+    // finalAmount,
+    // "VND", // Đơn vị tiền tệ
+    // "paypal", // Phương thức thanh toán cố định là "paypal"
+    // "sale", // Ý định thanh toán (sale/authorize/order)
+    // "Thanh toán",
+    // cancelUrl,
+    // successUrl);
+    // // Redirect đến PayPal để thanh toán
+    // return new RedirectView(payment.getLinks().get(1).getHref());
 
-        } catch (Exception e) {
-            System.err.println(e.getMessage());
-            return new RedirectView("/payment/error");
-        }
-    }
+    // } catch (Exception e) {
+    // System.err.println(e.getMessage());
+    // return new RedirectView("/payment/error");
+    // }
+    // }
 
-    @GetMapping("/payment/success")
+    // }
+
+    @GetMapping("/success")
     public String paymentSuccess(
             @RequestParam("paymentId") String paymentId,
             @RequestParam("PayerID") String payerId) {
@@ -66,7 +83,7 @@ public class PayPalController {
         return "success";
     }
 
-    @GetMapping("/payment/cancel")
+    @GetMapping("/cancel")
     public String paymentCancel() {
         return "paymentCancel";
     }

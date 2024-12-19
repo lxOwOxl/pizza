@@ -62,7 +62,9 @@ public class AdminController {
             @RequestParam(required = false) Integer id,
             Model model) {
         if (id == null) {
-            model.addAttribute("product", new Product());
+            Product product = new Product();
+            product.setType(type);
+            model.addAttribute("product", product);
             model.addAttribute("type", type);
 
         } else {

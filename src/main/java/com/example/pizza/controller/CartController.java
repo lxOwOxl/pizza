@@ -7,6 +7,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,9 +29,11 @@ import com.example.pizza.enums.ProductType;
 import com.example.pizza.enums.Size;
 import com.example.pizza.model.Cart;
 import com.example.pizza.model.CartItem;
+import com.example.pizza.model.UserDTO;
 import com.example.pizza.service.CartService;
 import com.example.pizza.service.ComboService;
 import com.example.pizza.service.ProductService;
+import com.example.pizza.service.UserService;
 
 @Controller
 @RequestMapping("/cart")
@@ -39,6 +44,8 @@ public class CartController {
     private ComboService comboService;
     @Autowired
     private CartService cartService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/add")
     public String addProduct(
@@ -133,10 +140,33 @@ public class CartController {
 
     @GetMapping("/checkout")
     public String showCheckoutForm(Model model) {
-        User user = new User();
 
-        model.addAttribute("user", user);
+        UserDTO userDTO = new UserDTO();
+        // Lấy thông tin người dùng đăng nhập (nếu có)
+        // Authentication authentication =
+        // SecurityContextHolder.getContext().getAuthentication();
+        // if (authentication != null && authentication.isAuthenticated()
+        // && !(authentication instanceof AnonymousAuthenticationToken)) {
+        // // Lấy email hoặc username từ thông tin đăng nhập
+        // String username = authentication.getName();
+
+        // // Tìm người dùng trong cơ sở dữ liệu
+        // User user = userService.findByEmailOrUsername(username); // Cần triển khai
+        // phương thức này
+
+        // if (user != null) {
+        // // Gán thông tin từ User vào UserDTO
+        // userDTO.setFullName(user.getFullName());
+        // userDTO.setEmail(user.getEmail());
+        // userDTO.setPhone(user.getPhone());
+        // userDTO.setAddress(user.getAddress());
+        // }
+        // }
+
+        // Thêm UserDTO và tổng tiền vào model
+        model.addAttribute("userDTO", userDTO);
         model.addAttribute("totalAmount", cartService.getTotalAmount());
+
         return "customer/cart/payment";
     }
 

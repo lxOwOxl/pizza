@@ -6,6 +6,7 @@ import com.paypal.base.rest.PayPalRESTException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,7 +19,7 @@ public class PayPalService {
     private final APIContext apiContext;
 
     public Payment createPayment(
-            Double total,
+            BigDecimal total,
             String currency,
             String method,
             String intent,

@@ -74,7 +74,7 @@
             accept="image/*"
           />
         </div>
-
+        <div th:if="${type.name()!='DRINK'}"></div>
         <!-- Vị cay có hoặc không -->
         <div class="mb-3">
           <label class="form-label">Vị cay</label>
@@ -107,13 +107,12 @@
         <div class="mb-3">
           <label for="image" class="form-label">Loại sản phẩm: </label>
 
-          <label for="image" class="form-label" th:text="${type}"></label>
+          <label for="image" class="form-label" th:text="*{type}"></label>
           <input
             type="hidden"
             class="form-control"
             id="type"
             th:field="*{type}"
-            th:value="${type}"
           />
         </div>
 
