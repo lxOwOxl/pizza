@@ -47,7 +47,7 @@
             <!-- Cột hình ảnh -->
             <td>
               <img
-                th:src="@{/images/} + ${entry.value.image}"
+                th:src="@{/images/} + ${entry.value.productDTO.image}"
                 alt="Product Image"
                 class="img-fluid rounded"
                 style="max-width: 80px; height: auto"
@@ -56,19 +56,20 @@
 
             <!-- Cột tên sản phẩm -->
             <td>
-              <span th:text="${entry.value.name}"></span>
-              <div th:if="${entry.value.type.name() == 'PIZZA'}">
+              <span th:text="${entry.value.productDTO.name}"></span>
+              <div th:if="${entry.value.productDTO.type.name() == 'PIZZA'}">
                 <small>
-                  Crust: <span th:text="${entry.value.crust}"></span><br />
-                  Size: <span th:text="${entry.value.size}"></span>
+                  Crust: <span th:text="${entry.value.productDTO.crust}"></span
+                  ><br />
+                  Size: <span th:text="${entry.value.productDTO.size}"></span>
                 </small>
               </div>
-              <div th:if="${entry.value.type.name() == 'COMBO'}">
+              <div th:if="${entry.value.comboDTO!=null}">
                 <small>
                   <ul>
                     <li
-                      th:each="product : ${entry.value.productList}"
-                      th:text="${product.name}"
+                      th:each="product : ${entry.value.comboDTO.productDTOs}"
+                      th:text="${productDTO.name}"
                     ></li>
                   </ul>
                 </small>
@@ -84,12 +85,16 @@
             <!-- Cột hành động -->
             <td>
               <div class="btn-group" role="group">
-                <a
-                  th:href="@{/cart/edit(key=${entry.key})}"
-                  class="btn btn-primary btn-sm"
+                <form
+                  th:action="@{/cart/edit(key=${entry.key})}"
+                  method="post"
+                  style="display: inline"
                 >
-                  Chỉnh sửa
-                </a>
+                  <button type="submit" class="btn btn-primary btn-sm">
+                    Chỉnh sửa
+                  </button>
+                </form>
+
                 <a
                   th:href="@{/cart/remove(key=${entry.key})}"
                   class="btn btn-danger btn-sm"

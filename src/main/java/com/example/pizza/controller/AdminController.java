@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import com.example.pizza.entity.Product;
 import com.example.pizza.entity.ProductPrice;
+import com.example.pizza.entity.User;
 import com.example.pizza.enums.Category;
 import com.example.pizza.enums.ProductType;
 import com.example.pizza.enums.Size;
@@ -137,4 +138,11 @@ public class AdminController {
     // model.addAttribute("users", users);
     // return "admin/users";
     // }
+    @GetMapping("/users")
+    public String listUsers(Model model) {
+        List<User> users = userService.getAllUsers();
+        System.out.println("First user: " + users.get(1).getUsername());
+        model.addAttribute("users", users);
+        return "admin/admin-users-view";
+    }
 }

@@ -1,188 +1,52 @@
 <!DOCTYPE html>
-<html lang="en">
+<html xmlns:th="http://www.thymeleaf.org">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Thêm Pizza</title>
-    <style>
-      .hidden {
-        display: none;
-      }
-    </style>
+    <title>Select Crust</title>
   </head>
-  <h1
-    th:text="${product.type.name() == 'PIZZA'} 
-    ? 'Tùy chọn ' + ${product.name} 
-    : 'Chọn số lượng ' + ${product.name}"
-  ></h1>
   <body>
-    <form action="/cart/add" method="POST">
+    <p th:text="${product.name}" th:value="${product.name}"></p>
+
+    <form action="/cart/add" method="post">
+      <input type="hidden" name="productId" th:value="${product.id}" />
       <input type="hidden" name="key" th:value="${key}" />
-      <input type="hidden" th:value="${product.id}" name="productId" />
-      <input type="hidden" th:value="${product.type}" name="productType" />
-
-      <div th:if="${product.type.name() == 'DRINK'}">
-        <!-- Gán giá của sản phẩm bằng giá của phần tử đầu tiên trong productPrices -->
-        <p
-          th:text="${productPrices.size() > 0 ? productPrices[0].price : 'Giá không có'}"
-        ></p>
-        <input
-          type="hidden"
-          name="drinkPrice"
-          th:value="${productPrices[0].price}"
-        />
-      </div>
-      <div th:if="${product.type.name() == 'PIZZA'}">
-        <label for="size">Chọn Size:</label>
-        <div th:each="productPrice : ${productPrices}">
-          <input
-            type="radio"
-            th:id="'size-' + ${productPrice.size}"
-            name="size"
-            th:checked="${productPrice.size == selectSize}"
-            th:value="${productPrice.size}"
-            th:data-price="${productPrice.price}"
-            onchange="calculateTotalPrice()"
-          />
-          <label
-            th:for="'size-' + ${productPrice.size}"
-            th:text="${productPrice.size} + ' - ' + ${productPrice.price} + ' đ'"
-          ></label>
-        </div>
-
-        <!-- Chọn Crust cho Size Vừa -->
-        <div id="medium-crust-options">
-          <label>Chọn Loại Đế cho Size Vừa:</label>
-          <div th:each="mediumCrustPrice : ${mediumCrustPrices}">
-            <input
-              type="radio"
-              th:id="'mediumCrust-' + ${mediumCrustPrice.id}"
-              name="crust"
-              th:value="${mediumCrustPrice.crust}"
-              th:data-price="${mediumCrustPrice.additionalPrice}"
-              th:checked="${mediumCrustPrice.crust == selectCrust}"
-              onchange="calculateTotalPrice()"
-            />
-            <label
-              th:for="'mediumCrust-' + ${mediumCrustPrice.id}"
-              th:text="${mediumCrustPrice.crust} + ' - ' + ${mediumCrustPrice.additionalPrice} + ' đ'"
-            ></label>
-          </div>
-        </div>
-
-        <!-- Chọn Crust cho Size Lớn -->
-        <div id="large-crust-options" class="hidden">
-          <label>Chọn Loại Đế cho Size Lớn:</label>
-          <div th:each="largeCrustPrice : ${largeCrustPrices}">
-            <input
-              type="radio"
-              th:id="'largeCrust-' + ${largeCrustPrice.id}"
-              name="crust"
-              th:value="${largeCrustPrice.crust}"
-              th:data-price="${largeCrustPrice.additionalPrice}"
-              onchange="calculateTotalPrice()"
-            />
-            <label
-              th:for="'largeCrust-' + ${largeCrustPrice.id}"
-              th:text="${largeCrustPrice.crust} + ' - ' + ${largeCrustPrice.additionalPrice} + ' đ'"
-            ></label>
+      <div th:if="${product.type.name()=='PIZZA'}">
+        <div th:each="entry : ${crustPrices}">
+          <h3 th:text="'Size: ' + ${entry.key}"></h3>
+          <span
+            th:each="productPrice : ${product.prices}"
+            th:if="${productPrice.size == entry.key}"
+          >
+            <strong>Price: </strong><span th:text="${productPrice.price}"></span
+            ><br />
+          </span>
+          <div th:each="crustPrice : ${entry.value}">
+            <!-- Radio button for each CrustPrice -->
+            <label>
+              <input
+                type="radio"
+                th:value="${crustPrice.id}"
+                th:name="crustId"
+                th:id="'crust_' + ${crustPrice.id}"
+                th:checked="${crustPrice.id == check}"
+              />
+              <span th:text="${crustPrice.crust}"></span>-
+              <span th:text="${crustPrice.additionalPrice}"></span>
+              <!-- Display CrustPrice name --> </label
+            ><br />
           </div>
         </div>
       </div>
-      <!-- Input Số Lượng -->
-      <label for="quantity">Số Lượng:</label>
+
+      <label for="quantity">Quantity:</label>
       <input
         type="number"
         id="quantity"
         name="quantity"
-        th:value="${quantity}"
         min="1"
-        onchange="calculateTotalPrice()"
-      />
-      <!-- Hiển thị Tổng Giá -->
-      <h3>Tổng Giá: <span id="total-price">0 đ</span></h3>
-
-      <button type="submit">Tiếp tục</button>
+        th:value="${quantity}"
+        required
+      /><br /><br />
+      <button type="submit">Submit</button>
     </form>
-
-    <!-- JavaScript -->
-    <script>
-      function showCrustOptions(selectedSize) {
-        document.getElementById("medium-crust-options").classList.add("hidden");
-        document.getElementById("large-crust-options").classList.add("hidden");
-
-        if (selectedSize === "MEDIUM") {
-          document
-            .getElementById("medium-crust-options")
-            .classList.remove("hidden");
-        } else if (selectedSize === "LARGE") {
-          document
-            .getElementById("large-crust-options")
-            .classList.remove("hidden");
-        }
-        calculateTotalPrice();
-      }
-
-      function calculateTotalPrice() {
-        let totalPrice = 0;
-        const productType = document.querySelector(
-          "input[name='productType']"
-        ).value; // Giả sử có trường này cho loại sản phẩm (DRINK/PIZZA)
-
-        // Nếu sản phẩm là DRINK, chỉ cần tính số lượng nhân với giá sản phẩm
-        if (productType === "DRINK") {
-          const drinkPrice = document.querySelector(
-            "input[name='drinkPrice']"
-          ).value; // Giả sử có input cho giá của DRINK
-          const quantity = document.getElementById("quantity").value;
-          if (drinkPrice && quantity > 0) {
-            totalPrice = parseFloat(drinkPrice) * parseInt(quantity);
-          }
-        } else {
-          // Lấy giá của Size được chọn
-          const selectedSize = document.querySelector(
-            "input[name='size']:checked"
-          );
-          if (selectedSize) {
-            totalPrice += parseFloat(selectedSize.getAttribute("data-price"));
-          }
-
-          // Lấy giá của Crust được chọn
-          const selectedCrust = document.querySelector(
-            "input[name='crust']:checked"
-          );
-          if (selectedCrust) {
-            totalPrice += parseFloat(selectedCrust.getAttribute("data-price"));
-          }
-
-          // Lấy số lượng
-          const quantity = document.getElementById("quantity").value;
-          if (quantity > 0) {
-            totalPrice *= parseInt(quantity);
-          }
-        }
-
-        // Hiển thị tổng giá
-        document.getElementById("total-price").innerText =
-          totalPrice.toLocaleString("vi-VN") + " đ";
-      }
-
-      // Thêm sự kiện onchange vào input size để ẩn/hiện crust
-      document.querySelectorAll("input[name='size']").forEach((input) => {
-        input.addEventListener("change", (e) => {
-          showCrustOptions(e.target.value);
-        });
-      });
-
-      window.onload = function () {
-        calculateTotalPrice();
-        const selectedSize = document.querySelector(
-          "input[name='size']:checked"
-        );
-        if (selectedSize) {
-          showCrustOptions(selectedSize.value);
-        }
-      };
-    </script>
   </body>
 </html>

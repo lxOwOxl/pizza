@@ -3,6 +3,7 @@ package com.example.pizza.entity;
 import java.math.BigDecimal;
 
 import com.example.pizza.enums.Category;
+import com.example.pizza.enums.Crust;
 import com.example.pizza.enums.Size;
 
 import jakarta.persistence.Column;
@@ -36,6 +37,7 @@ public class Combo {
     private int drinkQuantity;
     private int sideDishQuantity;
     private Size size;
+    private Crust crust;
 
     public Integer getId() {
         return id;
@@ -131,6 +133,14 @@ public class Combo {
 
     public void setSize(Size size) {
         this.size = size;
+    }
+
+    public Crust getCrust() {
+        return crust;
+    }
+
+    public void setCrust(Crust crust) {
+        this.crust = crust;
     }
 
 }

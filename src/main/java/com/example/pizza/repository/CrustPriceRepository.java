@@ -23,7 +23,6 @@ public interface CrustPriceRepository extends JpaRepository<CrustPrice, Integer>
 
     CrustPrice findByCrustAndSize(Crust crust, Size size);
 
-    @Query("SELECT COALESCE(p.additionalPrice, 0) FROM CrustPrice p WHERE p.size = :size AND p.crust = :crust")
-    BigDecimal findPriceBySizeAndCrust(@Param("size") Size size, @Param("crust") Crust crust);
-
+    @Query("SELECT p FROM CrustPrice p WHERE p.size = :size AND p.crust = :crust")
+    CrustPrice findBySizeAndCrust(@Param("size") Size size, @Param("crust") Crust crust);
 }

@@ -2,14 +2,18 @@ package com.example.pizza.service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.example.pizza.entity.Order;
 import com.example.pizza.entity.OrderItem;
 import com.example.pizza.enums.OrderStatus;
 import com.example.pizza.enums.PaymentMethod;
+import com.example.pizza.model.CartItem;
 import com.example.pizza.model.UserDTO;
 import com.example.pizza.repository.OrderItemRepository;
 import com.example.pizza.repository.OrderRepository;
@@ -26,8 +30,16 @@ public class OrderService {
     @Autowired
     private CartService cartService;
 
-    public Order createOrderCOD(BigDecimal totalAmount, PaymentMethod paymentMethod, UserDTO userDTO) {
-        // Tạo đơn hàng COD
+    public Order createOrderCOD(BigDecimal totalAmount, PaymentMethod paymentMethod, UserDTO userDTO, String note) {
+
+        List<OrderItem> orderItems = new ArrayList<OrderItem>();
+        for (CartItem cartItem : cartService.getItems().values()) {
+            if (cartItem.getProductDTO().getType() != null) {
+
+            }
+            OrderItem orderItem = new OrderItem();
+
+        }
         Order order = new Order();
         order.setPaymentMethod(paymentMethod);
         order.setTotalAmount(totalAmount);

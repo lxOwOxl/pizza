@@ -47,6 +47,20 @@ public class Order {
 
     private BigDecimal totalAmount;
 
+    public Order() {
+    }
+
+    public Order(User user, PaymentMethod paymentMethod, OrderStatus status, LocalDateTime orderDate, String note,
+            List<OrderItem> orderItems, BigDecimal totalAmount) {
+        this.user = user;
+        this.paymentMethod = paymentMethod;
+        this.status = status;
+        this.orderDate = orderDate;
+        this.note = note;
+        this.orderItems = orderItems;
+        this.totalAmount = totalAmount;
+    }
+
     public Long getId() {
         return id;
     }

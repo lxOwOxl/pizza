@@ -40,6 +40,18 @@ public class OrderItem {
     private Crust crust;
     private BigDecimal price;
 
+    public OrderItem(Product product, Combo combo, int quantity, Size size, Crust crust, BigDecimal price) {
+        this.product = product;
+        this.combo = combo;
+        this.quantity = quantity;
+        this.size = size;
+        this.crust = crust;
+        this.price = price;
+    }
+
+    public OrderItem() {
+    }
+
     // Getters and Setters
     public Long getId() {
         return id;
