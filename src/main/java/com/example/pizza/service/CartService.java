@@ -63,53 +63,45 @@ public class CartService {
 
     public BigDecimal getTotalAmount() {
         BigDecimal total = BigDecimal.ZERO;
-        for (CartItem cartItem : cart.getItems().values()) {
-            total = total.add(cartItem.getTotalPrice());
+        Map<String, ProductDTO> productDTOs = getAllProducts();
+        for (ProductDTO productDTO : productDTOs.values()) {
+            total = total.add(productDTO.getPrice());
+        }
+        Map<String, ComboDTO> comboDTOs = getAllComboDTOs();
+        for (ComboDTO comboDTO : comboDTOs.values()) {
+            total = total.add(comboDTO.getPrice());
         }
         return total;
     }
 
-    public void save(int productId, Integer crustId, int quantity) {
-        ProductDTO productDTO = productService.getProductDTO(productId, crustId);
+    public void save(Integer productId, Integer crustId, Integer comboId, List<Integer> productIds, int quantity) {
+        String cartKey = generateKey(productId, crustId, comboId, productIds);
 
-        CartItem itemToAdd = new CartItem(productDTO, quantity);
-
-        String cartKey = generateKey(itemToAdd);
         if (cart.getItems().containsKey(cartKey)) {
             CartItem existingItem = cart.getItems().get(cartKey);
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
-            existingItem.setTotalPrice(calculateCartItemPrice(existingItem));
         } else {
-            itemToAdd.setTotalPrice(calculateCartItemPrice(itemToAdd));
+            CartItem itemToAdd = new CartItem(productId, comboId, crustId, quantity, productIds);
             cart.getItems().put(cartKey, itemToAdd);
         }
     }
 
-    public void update(int productId, Integer crustId, int quantity, String keyToEdit) {
-        ProductDTO productDTO = productService.getProductDTO(productId, crustId);
-        CartItem newItem = new CartItem(productDTO, quantity);
+    public void update(Integer productId, Integer crustId, Integer comboId, List<Integer> productIds, int quantity,
+            String editKey) {
 
-        String newKey = generateKey(newItem);
-
-        // Kiểm tra xem key đang chỉnh sửa có giống với key mới không
-        if (keyToEdit.equals(newKey)) {
-            newItem.setTotalPrice(calculateCartItemPrice(newItem));
-            cart.getItems().put(newKey, newItem);
-
+        String newKey = generateKey(productId, crustId, comboId, productIds);
+        if (editKey.equals(newKey)) {
+            CartItem existingItem = cart.getItems().get(newKey);
+            existingItem.setQuantity(quantity);
+            cart.getItems().put(newKey, existingItem);
         } else if (cart.getItems().containsKey(newKey)) {
-            // Nếu newKey đã tồn tại trong giỏ hàng, cập nhật số lượng và giá, sau đó xóa
-            // item cũ
             CartItem existingItem = cart.getItems().get(newKey);
             existingItem.setQuantity(existingItem.getQuantity() + quantity);
-            existingItem.setTotalPrice(calculateCartItemPrice(existingItem));
-            // Xóa item với keyToEdit nếu có trong giỏ hàng
-            cart.getItems().remove(keyToEdit);
+            cart.getItems().remove(editKey);
         } else {
-            // Nếu newKey chưa tồn tại trong giỏ hàng, thêm item mới vào giỏ hàng
-            newItem.setTotalPrice(calculateCartItemPrice(newItem));
+            CartItem newItem = new CartItem(productId, comboId, crustId, quantity, productIds);
             cart.getItems().put(newKey, newItem);
-            cart.getItems().remove(keyToEdit);
-
+            cart.getItems().remove(editKey);
         }
     }
 
@@ -125,60 +117,42 @@ public class CartService {
         return cart.getItems().get(key);
     }
 
-    public void addCombo(int id, List<Integer> productIds, int quantity) {
-        ComboDTO comboDTO = comboService.getComboDTO(id, productIds);
-        CartItem cartItem = new CartItem(comboDTO, quantity);
-        String comboKey = generateKey(cartItem);
-
-        if (cart.getItems().containsKey(comboKey)) {
-            CartItem existingItem = cart.getItems().get(comboKey);
-            existingItem.setQuantity(existingItem.getQuantity() + quantity);
-            existingItem.setTotalPrice(calculateCartItemPrice(existingItem));
-        } else {
-            cartItem.setTotalPrice(calculateCartItemPrice(cartItem));
-            cart.getItems().put(comboKey, cartItem);
+    private String generateKey(Integer productId, Integer crustId, Integer comboId, List<Integer> productIds) {
+        String str = "";
+        if (productIds != null) {
+            for (Integer id : productIds) {
+                str = "-" + id;
+            }
         }
+        return productId + "-" + crustId + "-" + comboId + "-" + str;
     }
 
-    private String generateKey(CartItem cartItem) {
-        if (cartItem.getComboDTO() == null) {
-            return cartItem.getProductDTO().getId() + "-" + cartItem.getProductDTO()
-                    .getType() + "-" + cartItem.getProductDTO().getCrust() + "-"
-                    + cartItem.getProductDTO().getSize();
+    public Map<String, ProductDTO> getAllProducts() {
+        Map<String, ProductDTO> productDTOs = new HashMap<>();
+        // Duyệt qua các entry của cart.getItems()
+        for (Map.Entry<String, CartItem> entry : cart.getItems().entrySet()) {
+            CartItem cartItem = entry.getValue();
+            if (cartItem.getProductId() != null) {
+                ProductDTO productDTO = productService.getProductDTO(cartItem.getProductId(), cartItem.getCrustId(),
+                        cartItem.getQuantity());
+                // Sử dụng productId làm key trong map productDTOs
+                productDTOs.put(entry.getKey(), productDTO);
+            }
         }
-        String str = String.valueOf(cartItem.getComboDTO().getId());
-        for (ProductDTO dto : cartItem.getComboDTO().getProductDTOs()) {
-            str += "-" + dto.getId();
-        }
-        return str;
-
+        return productDTOs;
     }
 
-    public BigDecimal calculateCartItemPrice(CartItem cartItem) {
-        if (cartItem.getComboDTO() == null) {
-            return cartItem.getProductDTO().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
+    public Map<String, ComboDTO> getAllComboDTOs() {
+        Map<String, ComboDTO> comboDTOs = new HashMap<>();
+        // Duyệt qua các entry của cart.getItems()
+        for (Map.Entry<String, CartItem> entry : cart.getItems().entrySet()) {
+            CartItem cartItem = entry.getValue();
+            if (cartItem.getComboId() != null) {
+                ComboDTO comboDTO = comboService.getComboDTO(cartItem.getComboId(), cartItem.getProductIds());
+                comboDTOs.put(entry.getKey(), comboDTO);
+            }
         }
-
-        return cartItem.getComboDTO().getPrice().multiply(BigDecimal.valueOf(cartItem.getQuantity()));
-    }
-
-    public void updateCombo(int id, List<Integer> productIds, int quantity, String keyToEdit) {
-        ComboDTO comboDTO = comboService.getComboDTO(id, productIds);
-        CartItem newCartItem = new CartItem(comboDTO, quantity);
-        String newKey = generateKey(newCartItem);
-        if (newKey.equals(keyToEdit)) {
-            CartItem existingItem = cart.getItems().get(newKey);
-            existingItem.setQuantity(existingItem.getQuantity() + quantity);
-            existingItem.setTotalPrice(calculateCartItemPrice(existingItem));
-        } else if (cart.getItems().containsKey(newKey)) {
-            CartItem existingItem = cart.getItems().get(newKey);
-            existingItem.setQuantity(existingItem.getQuantity() + quantity);
-            existingItem.setTotalPrice(calculateCartItemPrice(existingItem));
-            cart.getItems().remove(keyToEdit);
-        } else {
-            newCartItem.setTotalPrice(calculateCartItemPrice(newCartItem));
-            cart.getItems().put(newKey, newCartItem);
-        }
+        return comboDTOs;
     }
 
 }

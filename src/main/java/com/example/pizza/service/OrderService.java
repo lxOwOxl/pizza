@@ -34,9 +34,7 @@ public class OrderService {
 
         List<OrderItem> orderItems = new ArrayList<OrderItem>();
         for (CartItem cartItem : cartService.getItems().values()) {
-            if (cartItem.getProductDTO().getType() != null) {
 
-            }
             OrderItem orderItem = new OrderItem();
 
         }

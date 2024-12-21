@@ -33,6 +33,8 @@ import com.example.pizza.model.Cart;
 import com.example.pizza.model.CartItem;
 import com.example.pizza.model.CartKey;
 import com.example.pizza.model.CheckoutForm;
+import com.example.pizza.model.ComboDTO;
+import com.example.pizza.model.ProductDTO;
 import com.example.pizza.model.UserDTO;
 import com.example.pizza.service.CartService;
 import com.example.pizza.service.ComboService;
@@ -59,14 +61,14 @@ public class CartController {
     public String addProduct(
             @RequestParam(required = false) Integer crustId,
             @RequestParam(required = false) String key,
-            @RequestParam int productId,
+            @RequestParam Integer productId,
             @RequestParam(required = false) Integer quantity) {
         System.out.println("giá trị của key " + key);
         if (key.isEmpty() || key.isEmpty()) {
-            cartService.save(productId, crustId, quantity);
+            cartService.save(productId, crustId, null, null, quantity);
             return "redirect:/menu";
         } else {
-            cartService.update(productId, crustId, quantity, key);
+            cartService.update(productId, crustId, null, null, quantity, key);
             return "redirect:/cart";
         }
 
@@ -82,9 +84,9 @@ public class CartController {
                 .map(Integer::parseInt)
                 .collect(Collectors.toList());
         if (key == null || key.isEmpty()) {
-            cartService.addCombo(id, productIds, quantity);
+            cartService.save(null, null, id, productIds, quantity);
         } else {
-            cartService.updateCombo(id, productIds, quantity, key);
+            cartService.update(null, null, id, productIds, quantity, key);
         }
 
         return "redirect:/menu";
@@ -93,7 +95,8 @@ public class CartController {
     @GetMapping
     public String viewCart(Model model) {
         model.addAttribute("totalAmount", cartService.getTotalAmount());
-        model.addAttribute("cartItems", cartService.getItems());
+        model.addAttribute("productDTOs", cartService.getAllProducts());
+        model.addAttribute("comboDTOs", cartService.getAllComboDTOs());
         return "customer/cart/cart-view";
     }
 
@@ -114,8 +117,8 @@ public class CartController {
             throw new RuntimeException("Không tìm thấy sản phẩm trong giỏ hàng");
         }
         model.addAttribute("key", key);
-        if (itemToEdit.getComboDTO() == null) {
-            Product product = productService.getProductById(itemToEdit.getProductDTO().getId());
+        if (itemToEdit.getComboId() == null) {
+            Product product = productService.getProductById(itemToEdit.getProductId());
             model.addAttribute("product", product);
             model.addAttribute("crustPrices", productService.getAllCrustPrice());
             // model.addAttribute("check", itemToEdit.getCrustPrice().getId());
@@ -123,7 +126,7 @@ public class CartController {
 
             return "customer/menu/customize-product";
         }
-        Combo combo = comboService.getComboById(itemToEdit.getComboDTO().getId());
+        Combo combo = comboService.getComboById(itemToEdit.getComboId());
 
         // Load danh sách sản phẩm cho combo kèm thông tin maxQuantity
         Map<ProductType, Object> productOptions = comboService.getComboOptionsWithQuantities(combo);
@@ -149,9 +152,10 @@ public class CartController {
     @PostMapping("/apply-coupon")
     public String applyCoupon(@ModelAttribute CheckoutForm checkoutForm, @RequestParam String coupon, Model model) {
         try {
-            BigDecimal totalAmount = couponService.calculateFinalAmountByCoupon(coupon,
+            BigDecimal finalAmount = couponService.calculateFinalAmountByCoupon(coupon,
                     cartService.getTotalAmount());
             CheckoutForm newCheckoutForm = cartService.prepareCheckoutForm();
+            newCheckoutForm.setFinalAmount(finalAmount);
             model.addAttribute("checkoutForm", newCheckoutForm);
             return "customer/cart/checkout";
         } catch (IllegalArgumentException e) {

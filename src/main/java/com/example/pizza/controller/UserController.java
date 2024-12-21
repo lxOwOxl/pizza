@@ -28,14 +28,6 @@ public class UserController {
         return "user/login"; // Trả về trang login
     }
 
-    @GetMapping("/admin/users")
-    public String listUsers(Model model) {
-        List<User> users = userService.getAllUsers();
-        System.out.println("First user: " + users.get(1).getUsername());
-        model.addAttribute("users", users);
-        return "admin/user/manage-users"; // Trỏ đến file Thymeleaf `manage-users.html`
-    }
-
     // Hiển thị trang đăng ký
     @GetMapping("/register")
     public String showRegisterPage(Model model) {

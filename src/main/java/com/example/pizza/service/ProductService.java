@@ -31,19 +31,20 @@ public class ProductService {
     @Autowired
     private CrustPriceRepository crustPriceRepository;
 
-    public ProductDTO getProductDTO(int productId, Integer crustId) {
+    public ProductDTO getProductDTO(int productId, Integer crustId, int quantity) {
         Product product = getProductById(productId);
         CrustPrice crustPrice = new CrustPrice();
         BigDecimal price = BigDecimal.ZERO;
         if (product.getType() == ProductType.PIZZA) {
             crustPrice = getCrustPriceById(crustId);
             price = productPriceRepository.findPriceByProductIdAndSize(productId, crustPrice.getSize())
-                    .add(crustPrice.getAdditionalPrice());
+                    .add(crustPrice.getAdditionalPrice()).multiply(BigDecimal.valueOf(quantity));
         } else {
-            price = productPriceRepository.findPriceByProductIdAndSize(productId, null);
+            price = productPriceRepository.findPriceByProductIdAndSize(productId, null)
+                    .multiply(BigDecimal.valueOf(quantity));
         }
-        return new ProductDTO(product.getId(), product.getName(), product.getImage(),
-                product.getType(), crustPrice.getSize(), crustPrice.getCrust(), price);
+        return new ProductDTO(product.getId(), product.getName(), product.getType(), product.getImage(),
+                crustPrice.getSize(), crustPrice.getCrust(), quantity, price);
     }
 
     public Map<Size, List<CrustPrice>> getAllCrustPrice() {

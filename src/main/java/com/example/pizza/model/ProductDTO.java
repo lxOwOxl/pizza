@@ -14,28 +14,31 @@ public class ProductDTO {
     private Integer id;
     private String name;
     private String image;
-    private ProductType type;
     private Size size;
     private Crust crust;
+    private ProductType type;
+    private Integer quantity;
     private BigDecimal price;
-
-    public ProductDTO(Integer id, String name, String image, ProductType type, Size size, Crust crust,
-            BigDecimal price) {
-        this.id = id;
-        this.name = name;
-        this.image = image;
-        this.type = type;
-        this.size = size;
-        this.crust = crust;
-        this.price = price;
-    }
 
     public ProductDTO(Integer id, String name, ProductType type, Size size, Crust crust) {
         this.id = id;
-        this.name = name;
         this.type = type;
+        this.name = name;
         this.size = size;
         this.crust = crust;
+    }
+
+    public ProductDTO(Integer id, String name, ProductType type, String image, Size size, Crust crust,
+            Integer quantity,
+            BigDecimal price) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.image = image;
+        this.size = size;
+        this.crust = crust;
+        this.quantity = quantity;
+        this.price = price;
     }
 
     public Integer getId() {
@@ -62,14 +65,6 @@ public class ProductDTO {
         this.image = image;
     }
 
-    public BigDecimal getPrice() {
-        return price;
-    }
-
-    public void setPrice(BigDecimal price) {
-        this.price = price;
-    }
-
     public Size getSize() {
         return size;
     }
@@ -84,6 +79,22 @@ public class ProductDTO {
 
     public void setCrust(Crust crust) {
         this.crust = crust;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
     }
 
     public ProductType getType() {
