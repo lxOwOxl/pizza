@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý Pizza</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <nav th:replace="~{layout/base :: navbar}"></nav>
+    <div>
+      <h1 class="text-center">Danh sách Pizza</h1>
+      <a class="btn btn-primary mb-3" th:href="@{/admin/pizza/add}"
+        >Thêm Pizza</a
+      >
+      <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th rowspan="2">ID</th>
+            <th rowspan="2">Tên</th>
+            <th colspan="3">Giá</th>
+            <th rowspan="2">Mô tả</th>
+            <th rowspan="2">Hình ảnh</th>
+            <th rowspan="2">Loại</th>
+            <th rowspan="2">Cay</th>
+            <th rowspan="2">Hành động</th>
+          </tr>
+
+          <tr>
+            <th>nhỏ</th>
+            <th>vừa</th>
+            <th>lớn</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="pizza : ${pizzas}">
+            <td th:text="${pizza.id}"></td>
+            <td th:text="${pizza.product.name}"></td>
+            <td th:text="${pizza.smallPrice}"></td>
+            <td th:text="${pizza.mediumPrice}"></td>
+            <td th:text="${pizza.largePrice}"></td>
+            <td th:text="${pizza.product.description}"></td>
+            <td>
+              <img
+                th:src="@{'/img/pizza/'+${pizza.product.image}}"
+                alt="Ảnh Pizza"
+                width="100"
+              />
+            </td>
+            <td th:text="${pizza.type}"></td>
+            <td th:text="${pizza.spicy ? 'Có' : 'Không'}"></td>
+            <td>
+              <a
+                class="btn btn-sm btn-warning"
+                th:href="@{'/admin/pizza/edit/' + ${pizza.id}}"
+                >Sửa</a
+              >
+              <a
+                class="btn btn-sm btn-danger"
+                th:href="@{'/admin/pizza/delete/' + ${pizza.id}}"
+                >Xóa</a
+              >
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+  </body>
+</html>

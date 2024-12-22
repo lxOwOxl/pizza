@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chọn Pizza</title>
+  </head>
+  <body>
+    <h1>Chọn Pizza</h1>
+
+    <!-- Form để chọn size và crust -->
+    <form action="#" method="POST">
+      <div>
+        <label for="size">Chọn Size:</label>
+        <select name="size" id="size" onchange="updateCrustOptions(this.value)">
+          <option
+            th:each="size : ${prices}"
+            th:value="${size}"
+            th:text="${size}"
+          ></option>
+        </select>
+      </div>
+
+      <div>
+        <label for="crust">Chọn Crust:</label>
+        <select name="crust" id="crust">
+          <option
+            th:each="crust : ${crusts}"
+            th:value="${crust}"
+            th:text="${crust}"
+          ></option>
+        </select>
+      </div>
+
+      <div>
+        <button type="submit">Thêm vào Giỏ Hàng</button>
+      </div>
+    </form>
+
+    <script>
+      function updateCrustOptions(selectedSize) {
+        const crustSelect = document.getElementById("crust");
+        const options = crustSelect.getElementsByTagName("option");
+
+        // Làm sạch tất cả các option hiện tại
+        for (let option of options) {
+          crustSelect.removeChild(option);
+        }
+
+        // Thêm crust tương ứng với size chọn
+        const crusts =
+          selectedSize === "SMALL"
+            ? ["TRADITIONAL", "THICK"]
+            : ["TRADITIONAL", "THICK", "STUFFED", "CHEESE"];
+        for (let crust of crusts) {
+          let option = document.createElement("option");
+          option.value = crust;
+          option.text = crust;
+          crustSelect.appendChild(option);
+        }
+      }
+    </script>
+  </body>
+</html>

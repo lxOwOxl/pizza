@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Menu Pizza</title>
+    <link
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <style>
+      .pizza-card {
+        border: 1px solid #ddd;
+        border-radius: 10px;
+        overflow: hidden;
+        margin-bottom: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      }
+      .pizza-card img {
+        width: 100%;
+        height: 200px;
+        object-fit: cover;
+      }
+      .pizza-card-body {
+        padding: 15px;
+      }
+      .pizza-card-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+      .pizza-price {
+        font-size: 1.2rem;
+        color: #d9534f;
+        font-weight: bold;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container mt-5">
+      <h1 class="text-center mb-4">Menu Pizza</h1>
+      <div class="row">
+        <!-- Lặp qua từng pizza trong danh sách pizza -->
+        <div class="col-md-4" th:each="pizza : ${pizzas}">
+          <div class="pizza-card">
+            <img th:src="@{'/img/pizza/'+${pizza.image}}" alt="Pizza Image" />
+            <div class="pizza-card-body">
+              <h5 class="pizza-card-title" th:text="${pizza.name}"></h5>
+              <p class="text-muted" th:text="${pizza.description}"></p>
+              <p class="pizza-price" th:text="${pizza.smallPrice} + ' VND'"></p>
+              <a href="#" class="btn btn-danger btn-block">Chọn</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.4.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>

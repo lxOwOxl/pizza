@@ -1,0 +1,127 @@
+/* Thay đổi nền trang và màu chữ */
+body {
+    background-color: #f8f9fa;
+    /* Nền sáng hơn */
+    color: #333;
+    /* Màu chữ tối hơn để dễ đọc */
+    font-family: 'Arial', sans-serif;
+}
+
+/* Navbar */
+.navbar {
+    background-color: #c0392b;
+    /* Tông đỏ cho navbar */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #fff !important;
+}
+
+.navbar-nav .nav-link {
+    font-size: 1.1rem;
+    color: #fff;
+    margin: 0 10px;
+    transition: color 0.3s;
+}
+
+.navbar-nav .nav-link:hover,
+.navbar-nav .nav-link.active {
+    color: #f1c40f !important;
+    font-weight: bold;
+}
+
+/* Các nút trên navbar */
+.navbar .navbar-nav .nav-item button {
+    background-color: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    margin-left: 10px;
+    transition: background-color 0.3s;
+}
+
+.navbar .navbar-nav .nav-item button:hover {
+    background-color: #fff;
+    color: #c0392b;
+}
+
+/* Card */
+.card {
+    background-color: #fff;
+    /* Nền trắng cho card */
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.card-img-top {
+    border-top-left-radius: 10px;
+    border-top-right-radius: 10px;
+}
+
+.card-title {
+    color: #c0392b;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+
+.card-text {
+    color: #555;
+}
+
+/* Nút Add to Cart */
+.btn-primary {
+    background-color: #c0392b;
+    border: none;
+    color: #fff;
+    transition: background-color 0.3s;
+}
+
+.btn-primary:hover {
+    background-color: #e74c3c;
+}
+
+/* Thêm hiệu ứng hover cho các link */
+.text-decoration-none {
+    text-decoration: none;
+}
+
+.text-decoration-none:hover {
+    color: #c0392b;
+}
+
+/* Các section */
+section {
+    padding: 60px 0;
+}
+
+h2 {
+    font-size: 2rem;
+    color: #c0392b;
+    font-weight: bold;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+}
+
+/* Nền của từng section */
+.bg-dark {
+    background-color: #2c3e50 !important;
+}
+
+.bg-light {
+    background-color: #ecf0f1 !important;
+}
+
+/* Đảm bảo hình ảnh và layout responsive */
+.card-img-top {
+    width: 100%;
+    height: auto;
+}
+
+@media (max-width: 768px) {
+    .navbar-nav {
+        margin: 0;
+    }
+}

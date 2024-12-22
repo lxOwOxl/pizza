@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản lý Pizza</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-black"
+      th:fragment="content"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="/">PizzaAdmin</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link active" th:href="@{/admin/product}"
+                >Danh sách Menu</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/admin/users}"
+                >Danh sách Người dùng</a
+              >
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-dark"
+      th:fragment="navbar"
+    >
+      <div class="container-fluid">
+        <a class="navbar-brand" href="#">Admin Panel</a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Dashboard</a>
+            </li>
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                th:href="@{/admin/product}"
+                id="menuManagementDropdown"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-haspopup="true"
+                aria-expanded="false"
+              >
+                Quản lý menu
+              </a>
+              <div
+                class="dropdown-menu"
+                aria-labelledby="menuManagementDropdown"
+              >
+                <a class="dropdown-item" th:href="@{/admin/pizza/list}"
+                  >Pizza</a
+                >
+                <a class="dropdown-item" th:href="@{/admin/drink/list}"
+                  >Drink</a
+                >
+                <a class="dropdown-item" th:href="@{/admin/sidedish/list}"
+                  >SideDish</a
+                >
+              </div>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Quản lý đơn hàng</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" th:href="@{/admin/users}"
+                >Quản lý khách hàng</a
+              >
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Báo cáo & Thống kê</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Cài đặt</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link text-danger" href="#">Đăng xuất</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <!-- Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+  </body>
+</html>
