@@ -42,7 +42,7 @@ public class MenuController {
         return "customer/menu/menu";
     }
 
-    @PostMapping("/product/custom")
+    @GetMapping("/product/custom")
     public String getProduct(@RequestParam int id, Model model) {
         Product product = productService.getProductById(id);
         model.addAttribute("product", product);

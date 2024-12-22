@@ -502,7 +502,7 @@ body {
           <div class="col-md-4 mb-4" th:each="combo : ${combos}" th>
             <form
               th:action="@{/menu/combo/custom}"
-              method="POST"
+              method="get"
               class="card h-100"
             >
               <img
@@ -549,7 +549,7 @@ body {
               <div class="card-body d-flex flex-column justify-content-center">
                 <h5 class="card-title" th:text="${pizza.name}"></h5>
                 <p class="card-text" th:text="${pizza.description}"></p>
-                <form th:action="@{/menu/product/custom}" method="POST">
+                <form th:action="@{/menu/product/custom}" method="get">
                   <input type="hidden" name="id" th:value="${pizza.id}" />
                   <button type="submit" class="btn btn-primary">Thử Ngay</button>
                 </form>
@@ -590,7 +590,7 @@ body {
               <div class="card-body d-flex flex-column justify-content-center">
                 <h5 class="card-title" th:text="${drink.name}"></h5>
                 <p class="card-text" th:text="${drink.description}"></p>
-                <form th:action="@{/menu/product/custom}" method="POST">
+                <form th:action="@{/menu/product/custom}" method="get">
                   <input type="hidden" name="id" th:value="${drink.id}" />
                   <button type="submit" class="btn btn-primary">Thử Ngay</button>
                 </form>
@@ -631,7 +631,7 @@ body {
             <div class="card-body d-flex flex-column justify-content-center">
               <h5 class="card-title" th:text="${sideDish.name}"></h5>
               <p class="card-text" th:text="${sideDish.description}"></p>
-              <form th:action="@{/menu/product/custom}" method="POST">
+              <form th:action="@{/menu/product/custom}" method="get">
                 <input type="hidden" name="id" th:value="${sideDish.id}" />
                 <button type="submit" class="btn btn-primary">Thử Ngay</button>
               </form>
