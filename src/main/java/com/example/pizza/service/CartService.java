@@ -155,4 +155,44 @@ public class CartService {
         return comboDTOs;
     }
 
+    public ProductPriceRepository getProductPriceRepository() {
+        return productPriceRepository;
+    }
+
+    public void setProductPriceRepository(ProductPriceRepository productPriceRepository) {
+        this.productPriceRepository = productPriceRepository;
+    }
+
+    public ProductService getProductService() {
+        return productService;
+    }
+
+    public void setProductService(ProductService productService) {
+        this.productService = productService;
+    }
+
+    public CrustPriceRepository getCrustPriceRepository() {
+        return crustPriceRepository;
+    }
+
+    public void setCrustPriceRepository(CrustPriceRepository crustPriceRepository) {
+        this.crustPriceRepository = crustPriceRepository;
+    }
+
+    public ComboService getComboService() {
+        return comboService;
+    }
+
+    public void setComboService(ComboService comboService) {
+        this.comboService = comboService;
+    }
+
+    public BigDecimal getDefaultShippingFee() {
+        return defaultShippingFee;
+    }
+
+    public void setDefaultShippingFee(BigDecimal defaultShippingFee) {
+        this.defaultShippingFee = defaultShippingFee;
+    }
+
 }

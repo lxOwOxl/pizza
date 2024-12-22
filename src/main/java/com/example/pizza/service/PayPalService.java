@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,12 +28,8 @@ public class PayPalService {
             String cancelUrl,
             String successUrl) throws PayPalRESTException {
         Amount amount = new Amount();
-        Locale localeVN = new Locale("vi", "VN");
-
-        NumberFormat numberFormatter = NumberFormat.getNumberInstance(localeVN);
-        String formattedTotal = numberFormatter.format(total);
         amount.setCurrency(currency);
-        amount.setTotal(formattedTotal);
+        amount.setTotal(String.format(Locale.US, "%.2f", total));
 
         Transaction transaction = new Transaction();
         transaction.setDescription(description);

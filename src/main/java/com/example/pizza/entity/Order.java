@@ -28,8 +28,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = true) // Null nếu không đăng nhập
+    @ManyToOne(cascade = CascadeType.PERSIST)
+    @JoinColumn(name = "user_id", nullable = true)
     private User user;
 
     @Enumerated(EnumType.STRING)
@@ -51,13 +51,12 @@ public class Order {
     }
 
     public Order(User user, PaymentMethod paymentMethod, OrderStatus status, LocalDateTime orderDate, String note,
-            List<OrderItem> orderItems, BigDecimal totalAmount) {
+            BigDecimal totalAmount) {
         this.user = user;
         this.paymentMethod = paymentMethod;
         this.status = status;
         this.orderDate = orderDate;
         this.note = note;
-        this.orderItems = orderItems;
         this.totalAmount = totalAmount;
     }
 
