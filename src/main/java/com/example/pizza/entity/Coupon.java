@@ -15,8 +15,8 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "discount_codes")
-public class DiscountCode {
+@Table(name = "coupon")
+public class Coupon {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +46,9 @@ public class DiscountCode {
 
     @Column(name = "status", nullable = false)
     private Boolean status; // true = ACTIVE, false = INACTIVE
+
+    @Column(name = "current_usage", nullable = false)
+    private int currentUsage = 0;
 
     // Getters and setters
 
@@ -119,5 +122,13 @@ public class DiscountCode {
 
     public void setStatus(Boolean status) {
         this.status = status;
+    }
+
+    public int getCurrentUsage() {
+        return currentUsage;
+    }
+
+    public void setCurrentUsage(int currentUsage) {
+        this.currentUsage = currentUsage;
     }
 }

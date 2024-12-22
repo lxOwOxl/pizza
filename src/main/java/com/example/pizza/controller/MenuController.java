@@ -45,28 +45,17 @@ public class MenuController {
     @PostMapping("/product/custom")
     public String getProduct(@RequestParam int id, Model model) {
         Product product = productService.getProductById(id);
-        List<ProductPrice> productPrices = productService.getPriceListByProduct(id);
         model.addAttribute("product", product);
-        model.addAttribute("quantity", 1);
-        model.addAttribute("productPrices", productPrices);
-        if (product.getType() == ProductType.PIZZA) {
-            List<CrustPrice> mediumCrustPrices = productService.getCrustPriceListBySize(Size.MEDIUM);
-            List<CrustPrice> largeCrustPrices = productService.getCrustPriceListBySize(Size.LARGE);
-            model.addAttribute("selectCrust", Crust.TRADITIONAL);
-            model.addAttribute("selectSize", Size.MEDIUM);
-            model.addAttribute("mediumCrustPrices", mediumCrustPrices); // chứa giá theo size lớn
-            model.addAttribute("largeCrustPrices", largeCrustPrices); // chứa giá theo size vừa
-            // chứa giá theo từng size
-        }
+        model.addAttribute("crustPrices", productService.getAllCrustPriceMapBySize());
 
         return "customer/menu/customize-product";
+
     }
 
     @PostMapping("/combo/custom")
     public String getComboOptions(@RequestParam Integer id, Model model) {
         Combo combo = comboService.getComboById(id);
 
-        // Load danh sách sản phẩm cho combo kèm thông tin maxQuantity
         Map<ProductType, Object> productOptions = comboService.getComboOptionsWithQuantities(combo);
         model.addAttribute("combo", combo);
         // Đưa dữ liệu vào Model

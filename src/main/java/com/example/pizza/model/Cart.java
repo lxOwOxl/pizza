@@ -9,28 +9,14 @@ import org.springframework.web.context.annotation.SessionScope;
 @Component
 @SessionScope
 public class Cart {
-    private Map<Integer, CartItem> items = new HashMap<>();
+    private Map<String, CartItem> items = new HashMap<>();
 
-    public static int counter = 0;
-
-    public Map<Integer, CartItem> getItems() {
+    public Map<String, CartItem> getItems() {
         return items;
     }
 
-    public CartItem getItem(Integer key) {
-        return items.get(key);
-    }
-
-    public void setItems(Map<Integer, CartItem> items) {
+    public void setItems(Map<String, CartItem> items) {
         this.items = items;
-    }
-
-    public static int getCounter() {
-        return counter;
-    }
-
-    public static void setCounter(int counter) {
-        Cart.counter = counter;
     }
 
 }

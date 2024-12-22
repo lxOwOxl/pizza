@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Thêm CrustPrice</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <div class="container">
+      <h2>Thêm CrustPrice</h2>
+      <div
+        th:if="${message}"
+        class="alert alert-info"
+        role="alert"
+        th:text="${message}"
+      ></div>
+      <form th:action="@{/admin/crust-price/add}" method="post">
+        <div class="mb-3">
+          <label for="size" class="form-label">Size</label>
+          <select id="size" name="size" class="form-control" required>
+            <option
+              th:each="size : ${sizes}"
+              th:value="${size}"
+              th:text="${size}"
+            ></option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="crust" class="form-label">Crust</label>
+          <select id="crust" name="crust" class="form-control" required>
+            <option
+              th:each="crust : ${crusts}"
+              th:value="${crust}"
+              th:text="${crust}"
+            ></option>
+          </select>
+        </div>
+        <div class="mb-3">
+          <label for="additionalPrice" class="form-label">Giá thêm</label>
+          <input
+            type="number"
+            id="additionalPrice"
+            name="additionalPrice"
+            class="form-control"
+            step="0.01"
+            required
+          />
+        </div>
+        <button type="submit" class="btn btn-primary">Thêm</button>
+      </form>
+      <a href="/admin/products" class="btn btn-secondary mt-3">Quay lại</a>
+    </div>
+  </body>
+</html>

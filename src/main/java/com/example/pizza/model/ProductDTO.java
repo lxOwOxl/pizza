@@ -1,33 +1,52 @@
 package com.example.pizza.model;
 
+import java.math.BigDecimal;
+
+import com.example.pizza.entity.CrustPrice;
 import com.example.pizza.entity.Product;
+import com.example.pizza.enums.Crust;
+import com.example.pizza.enums.ProductType;
+import com.example.pizza.enums.Size;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class ProductDTO {
     private Integer id;
     private String name;
-    private String description;
     private String image;
-    private Boolean spicy;
-    private String type;
-    private String category;
-    private String pricesJson; // Trường giá trị JSON của prices
+    private Size size;
+    private Crust crust;
+    private ProductType type;
+    private Integer quantity;
+    private BigDecimal price;
 
-    public ProductDTO(Product product) throws JsonProcessingException {
+    public ProductDTO(Integer id, String name, ProductType type, Size size, Crust crust) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.size = size;
+        this.crust = crust;
+    }
 
-        this.id = product.getId();
-        System.out.println(product.getName());
-        this.name = product.getName();
-        this.description = product.getDescription();
-        this.image = product.getImage();
-        this.spicy = product.getSpicy();
-        this.type = product.getType().name();
-        this.category = product.getCategory().name();
+    public ProductDTO(Integer id, String name, ProductType type, String image, Size size, Crust crust,
+            Integer quantity,
+            BigDecimal price) {
+        this.id = id;
+        this.type = type;
+        this.name = name;
+        this.image = image;
+        this.size = size;
+        this.crust = crust;
+        this.quantity = quantity;
+        this.price = price;
+    }
 
-        // Chuyển prices thành JSON
-        ObjectMapper objectMapper = new ObjectMapper();
-        this.pricesJson = objectMapper.writeValueAsString(product.getPrices());
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
     }
 
     public String getName() {
@@ -38,14 +57,6 @@ public class ProductDTO {
         this.name = name;
     }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
     public String getImage() {
         return image;
     }
@@ -54,44 +65,44 @@ public class ProductDTO {
         this.image = image;
     }
 
-    public Boolean getSpicy() {
-        return spicy;
+    public Size getSize() {
+        return size;
     }
 
-    public void setSpicy(Boolean spicy) {
-        this.spicy = spicy;
+    public void setSize(Size size) {
+        this.size = size;
     }
 
-    public String getType() {
+    public Crust getCrust() {
+        return crust;
+    }
+
+    public void setCrust(Crust crust) {
+        this.crust = crust;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
+    public BigDecimal getPrice() {
+        return price;
+    }
+
+    public void setPrice(BigDecimal price) {
+        this.price = price;
+    }
+
+    public ProductType getType() {
         return type;
     }
 
-    public void setType(String type) {
+    public void setType(ProductType type) {
         this.type = type;
-    }
-
-    public String getCategory() {
-        return category;
-    }
-
-    public void setCategory(String category) {
-        this.category = category;
-    }
-
-    public String getPricesJson() {
-        return pricesJson;
-    }
-
-    public void setPricesJson(String pricesJson) {
-        this.pricesJson = pricesJson;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
     }
 
 }

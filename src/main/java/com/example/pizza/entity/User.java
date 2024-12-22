@@ -1,5 +1,6 @@
 package com.example.pizza.entity;
 
+import io.micrometer.common.lang.Nullable;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,15 +19,17 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank(message = "Username is required")
+    @Nullable
     @Size(min = 3, max = 20, message = "Username must be between 3 and 20 characters")
     private String username;
 
-    @NotBlank(message = "Password is required")
+    @Nullable
     @Size(min = 6, message = "Password must be at least 6 characters")
     private String password;
 
+    @NotBlank(message = "fullname is required")
     private String fullName;
+
     @NotBlank(message = "Email is required")
     @Email(message = "Email should be valid")
     private String email;
@@ -37,11 +40,30 @@ public class User {
 
     @NotBlank(message = "Address is required")
     private String address;
+
     @Column(nullable = false)
     private String role = "USER"; // "USER" hoặc "ADMIN"
 
     @Column(nullable = false)
     private boolean active = true;
+
+    public User(@NotBlank(message = "fullname is required") String fullName,
+            @NotBlank(message = "Email is required") @Email(message = "Email should be valid") String email,
+            @NotBlank(message = "Phone number is required") @Pattern(regexp = "^(\\+\\d{1,3}[- ]?)?\\d{10}$", message = "Phone number should be valid") String phoneNumber,
+            @NotBlank(message = "Address is required") String address, String role) {
+        this.fullName = fullName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.role = role;
+    }
+
+    public User(String username, String password, String email, String role) {
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.role = role;
+    }
 
     public Long getId() {
         return id;
@@ -92,13 +114,6 @@ public class User {
     }
 
     public User() {
-    }
-
-    public User(String username, String password, String email, String role) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
-        this.role = role;
     }
 
     public String getPhoneNumber() {

@@ -20,7 +20,8 @@ public interface ProductPriceRepository extends JpaRepository<ProductPrice, Inte
 
     List<ProductPrice> findByProduct(Product product);
 
-    @Query("SELECT p FROM ProductPrice p WHERE p.product.id = :productId AND p.size = :size")
+    @Query("SELECT p FROM ProductPrice p WHERE p.product.id = :productId AND " +
+            "(p.size = :size OR (p.size IS NULL AND :size IS NULL))")
     ProductPrice findByProductAndSize(@Param("productId") int productId, @Param("size") Size size);
 
     @Query("SELECT p FROM ProductPrice p WHERE p.product.id = :productId")

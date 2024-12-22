@@ -18,6 +18,10 @@ public class UserService {
         return userRepository.findAll();
     }
 
+    public User getUserByUserName(String userName) {
+        return userRepository.findByUsername(userName).orElse(null);
+    }
+
     @Autowired
     private PasswordEncoder passwordEncoder;
 

@@ -78,6 +78,7 @@
           <!-- Vị cay có hoặc không -->
           <div class="mb-3">
             <label class="form-label">Vị cay</label>
+
             <div class="form-check">
               <input
                 type="radio"
@@ -86,9 +87,12 @@
                 name="spicy"
                 th:value="true"
                 th:field="*{spicy}"
+                th:checked="${spicy != null and spicy}"
               />
+              <!-- Đánh dấu nếu spicy là true -->
               <label class="form-check-label" for="spicyYes">Có</label>
             </div>
+
             <div class="form-check">
               <input
                 type="radio"
@@ -97,7 +101,9 @@
                 name="spicy"
                 th:value="false"
                 th:field="*{spicy}"
+                th:checked="${spicy == null or not spicy}"
               />
+              <!-- Đánh dấu nếu spicy là false -->
               <label class="form-check-label" for="spicyNo">Không</label>
             </div>
           </div>
