@@ -23,7 +23,7 @@
         <nav
           id="adminNavBar"
           class="col-md-3 col-lg-2 d-md-block sidebar p-3"
-          th:replace="layout/admin-nav.html"
+          th:replace="~{layout/admin-nav.html}"
         ></nav>
 
         <!-- Content -->
@@ -38,8 +38,7 @@
                 data-toggle="modal"
                 data-target="#addProductModal"
               >
-                <i class="fas fa-plus"></i>
-                Thêm sản phẩm
+                <i class="fas fa-plus"></i> Thêm sản phẩm
               </button>
             </div>
 
@@ -59,7 +58,7 @@
               </thead>
               <tbody>
                 <!-- Lặp qua danh sách sản phẩm -->
-                <tr th:each="product : ${products}">
+                <tr th:each="product : ${productPage.content}">
                   <td th:text="${product.id}"></td>
                   <td th:text="${product.name}"></td>
                   <td>
@@ -82,12 +81,11 @@
                           <td
                             th:text="${price.size != null ? price.size : 'N/A'}"
                           ></td>
-                          <td th:text="${price.price+ ' đ'}"></td>
+                          <td th:text="${price.price + ' đ'}"></td>
                         </tr>
                       </tbody>
                     </table>
                   </td>
-
                   <td>
                     <form th:action="@{/admin/product/form}" method="get">
                       <input type="hidden" name="id" th:value="${product.id}" />
@@ -98,7 +96,6 @@
                         <i class="fas fa-edit"></i>
                       </button>
                     </form>
-
                     <form
                       th:action="@{/admin/products/delete}"
                       method="post"
@@ -116,7 +113,39 @@
                 </tr>
               </tbody>
             </table>
+
+            <!-- Phân trang -->
+            <div class="d-flex justify-content-center">
+              <ul class="pagination">
+                <li class="page-item" th:if="${currentPage > 0}">
+                  <a
+                    class="page-link"
+                    th:href="@{'/admin/products?page=' + (${currentPage} - 1) + '&size=' + ${productPage.size}}"
+                    >Previous</a
+                  >
+                </li>
+                <li
+                  class="page-item"
+                  th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+                  th:classappend="${i == currentPage} ? ' active' : ''"
+                >
+                  <a
+                    class="page-link"
+                    th:href="@{'/admin/products?page=' + ${i} + '&size=' + ${productPage.size}}"
+                    th:text="${i + 1}"
+                  ></a>
+                </li>
+                <li class="page-item" th:if="${currentPage < totalPages - 1}">
+                  <a
+                    class="page-link"
+                    th:href="@{'/admin/products?page=' + (${currentPage} + 1) + '&size=' + ${productPage.size}}"
+                    >Next</a
+                  >
+                </li>
+              </ul>
+            </div>
           </div>
+          <div th:replace="~{admin/crustPrice-view.html}"></div>
         </div>
       </div>
     </div>

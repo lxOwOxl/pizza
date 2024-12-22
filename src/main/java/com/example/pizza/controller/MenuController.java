@@ -46,7 +46,7 @@ public class MenuController {
     public String getProduct(@RequestParam int id, Model model) {
         Product product = productService.getProductById(id);
         model.addAttribute("product", product);
-        model.addAttribute("crustPrices", productService.getAllCrustPrice());
+        model.addAttribute("crustPrices", productService.getAllCrustPriceMapBySize());
 
         return "customer/menu/customize-product";
 

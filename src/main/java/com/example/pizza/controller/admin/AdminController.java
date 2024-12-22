@@ -1,27 +1,29 @@
-package com.example.pizza.controller;
+package com.example.pizza.controller.admin;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
+import com.example.pizza.entity.CrustPrice;
 import com.example.pizza.entity.Product;
 import com.example.pizza.entity.ProductPrice;
 import com.example.pizza.entity.User;
 import com.example.pizza.enums.Category;
+import com.example.pizza.enums.Crust;
 import com.example.pizza.enums.ProductType;
 import com.example.pizza.enums.Size;
 import com.example.pizza.service.FileSystemStorageService;
 import com.example.pizza.service.OrderService;
 import com.example.pizza.service.ProductService;
 import com.example.pizza.service.UserService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import java.util.List;
 import org.springframework.web.bind.annotation.PostMapping;
 
@@ -49,12 +51,27 @@ public class AdminController {
 
     // 2. Quản lý sản phẩm - Hiển thị danh sách sản phẩm
     @GetMapping("/products")
-    public String listProducts(Model model) throws JsonProcessingException {
-        List<Product> products = productService.getAllProducts();
+    public String listProducts(@RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "5") int size, Model model) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Product> productPage = productService.getAllProducts(pageable);
+        List<CrustPrice> crustPrices = productService.getAllCrustPrices();
+        model.addAttribute("crustPrices", crustPrices);
         model.addAttribute("types", ProductType.values());
-        model.addAttribute("products", products);
+        model.addAttribute("productPage", productPage);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", productPage.getTotalPages());
 
         return "admin/products";
+    }
+
+    // Thêm mới CrustPrice
+    @GetMapping("/add")
+    public String addCrustPriceForm(Model model) {
+        model.addAttribute("crustPrice", new CrustPrice());
+        model.addAttribute("sizes", Size.values());
+        model.addAttribute("crusts", Crust.values());
+        return "admin/crust-price/add";
     }
 
     // 3. Thêm sản phẩm mới - Hiển thị form

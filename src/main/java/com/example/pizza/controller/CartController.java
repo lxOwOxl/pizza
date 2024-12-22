@@ -104,7 +104,7 @@ public class CartController {
         if (itemToEdit.getComboId() == null) {
             Product product = productService.getProductById(itemToEdit.getProductId());
             model.addAttribute("product", product);
-            model.addAttribute("crustPrices", productService.getAllCrustPrice());
+            model.addAttribute("crustPrices", productService.getAllCrustPriceMapBySize());
             // model.addAttribute("check", itemToEdit.getCrustPrice().getId());
             model.addAttribute("quantity", itemToEdit.getQuantity());
 

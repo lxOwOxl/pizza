@@ -11,8 +11,11 @@ import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 
 @Entity
+@Table(name = "crust_price", uniqueConstraints = @UniqueConstraint(columnNames = { "size", "crust" }))
 public class CrustPrice {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

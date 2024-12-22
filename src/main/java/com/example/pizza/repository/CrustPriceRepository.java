@@ -25,4 +25,6 @@ public interface CrustPriceRepository extends JpaRepository<CrustPrice, Integer>
 
     @Query("SELECT p FROM CrustPrice p WHERE p.size = :size AND p.crust = :crust")
     CrustPrice findBySizeAndCrust(@Param("size") Size size, @Param("crust") Crust crust);
+
+    boolean existsBySizeAndCrust(Size size, Crust crust);
 }

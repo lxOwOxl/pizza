@@ -12,6 +12,8 @@ import com.example.pizza.repository.CrustPriceRepository;
 import com.example.pizza.repository.ProductPriceRepository;
 import com.example.pizza.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -47,7 +49,11 @@ public class ProductService {
                 crustPrice.getSize(), crustPrice.getCrust(), quantity, price);
     }
 
-    public Map<Size, List<CrustPrice>> getAllCrustPrice() {
+    public List<CrustPrice> getAllCrustPrices() {
+        return crustPriceRepository.findAll();
+    }
+
+    public Map<Size, List<CrustPrice>> getAllCrustPriceMapBySize() {
         Map<Size, List<CrustPrice>> crustPrices = new HashMap<>();
 
         for (Size size : Size.values()) {
@@ -57,6 +63,10 @@ public class ProductService {
         }
 
         return crustPrices;
+    }
+
+    public Page<Product> getAllProducts(Pageable pageable) {
+        return productRepository.findAll(pageable);
     }
 
     public CrustPrice getCrustPriceById(int CrustId) {
